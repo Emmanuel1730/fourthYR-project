@@ -1,53 +1,98 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-
+import { FiCheck, FiAlertCircle, FiArrowLeft, FiArrowRight, FiCreditCard, FiMail, FiPhone, FiMapPin, FiHome, FiDollarSign } from 'react-icons/fi';
+import { MdSchool, MdLocationOn, MdPhone, MdEmail, MdLock } from 'react-icons/md';
 
 // ─── CONFIG — change LOGIN_PATH to match your actual route ──────────────────
-const LOGIN_PATH  = '/';          // ← FIX THIS to your real login route
+const LOGIN_PATH  = '/';
 const API_BASE    = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 const PAYCHANGU_API = 'https://api.paychangu.com/payment';
 
-// ── tiny reusable field wrapper ──────────────────────────────────────────────
-const Field = ({ label, required, error, children }) => (
-  <div>
-    <label className="block text-xs font-medium text-[#8b949e] uppercase tracking-wider mb-1.5">
-      {label} {required && <span className="text-[#f85149]">*</span>}
+// ── Form Field Component ──────────────────────────────────────────────────────
+const Field = ({ label, required, error, icon: Icon, children }) => (
+  <div className="mb-4">
+    <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+      {Icon && <Icon size={12} className="text-emerald-400" />}
+      {label} {required && <span className="text-red-400">*</span>}
     </label>
     {children}
-    {error && <p className="text-[#f85149] text-xs mt-1">{error}</p>}
+    {error && (
+      <p className="text-red-400 text-xs mt-1.5 flex items-center gap-1">
+        <FiAlertCircle size={12} /> {error}
+      </p>
+    )}
   </div>
 );
 
-const inputCls =
-  'w-full bg-[#0d1117] border border-[#21262d] text-[#e6edf3] rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#2ea043] placeholder-[#6e7681] transition';
+const inputCls = 'w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 placeholder-gray-500 transition-all duration-200';
 
-// ────────────────────────────────────────────────────────────────────────────
+// ── Step Indicator Component ─────────────────────────────────────────────────
+const StepIndicator = ({ currentStep, steps }) => (
+  <div className="flex items-center justify-center gap-2 mb-8">
+    {steps.map((step, idx) => (
+      <React.Fragment key={step.number}>
+        <div className="flex flex-col items-center gap-1">
+          <div
+            className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+              currentStep === step.number
+                ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg shadow-emerald-500/25'
+                : currentStep > step.number
+                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50'
+                : 'bg-gray-700/50 text-gray-500 border border-gray-600'
+            }`}
+          >
+            {currentStep > step.number ? <FiCheck size={16} /> : step.number}
+          </div>
+          <span
+            className={`text-xs font-medium hidden sm:block ${
+              currentStep === step.number ? 'text-emerald-400' : 'text-gray-500'
+            }`}
+          >
+            {step.label}
+          </span>
+        </div>
+        {idx < steps.length - 1 && (
+          <div
+            className={`flex-1 h-0.5 max-w-[60px] rounded-full transition-all duration-300 ${
+              currentStep > step.number ? 'bg-gradient-to-r from-emerald-500 to-teal-500' : 'bg-gray-700'
+            }`}
+          />
+        )}
+      </React.Fragment>
+    ))}
+  </div>
+);
 
+// ── Loading Spinner ──────────────────────────────────────────────────────────
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center gap-2">
+    <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+    </svg>
+    <span>Loading...</span>
+  </div>
+);
+
+// ── Main Component ───────────────────────────────────────────────────────────
 export default function SchoolRegister() {
   const [searchParams] = useSearchParams();
 
-  // Query params set by PayChangu redirect
   const urlStep       = searchParams.get('step');
-  const urlStatus     = searchParams.get('status');   // success | failed | pending | error
+  const urlStatus     = searchParams.get('status');
   const urlTxRef      = searchParams.get('tx_ref');
-  const urlSchoolName = searchParams.get('school') ?? '';  // passed through callback_url
+  const urlSchoolName = searchParams.get('school') ?? '';
 
-  // Step: jump straight to result page if PayChangu redirected back
   const [step, setStep]         = useState(urlStep === 'result' ? 3 : 1);
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState(null);
   const [fee, setFee]           = useState(null);
   const [schoolId, setSchoolId] = useState(null);
 
-  // Step 1 — school details
   const [details, setDetails]           = useState({ name: '', location: '', phone: '' });
   const [detailErrors, setDetailErrors] = useState({});
+  const [email, setEmail]               = useState('');
+  const [emailError, setEmailError]     = useState('');
 
-  // Step 2 — contact email
-  const [email, setEmail]         = useState('');
-  const [emailError, setEmailError] = useState('');
-
-  // ── Fetch registration fee on mount ─────────────────────────────────────────
   useEffect(() => {
     fetch(`${API_BASE}/school/registration-fee`)
       .then((r) => r.json())
@@ -55,10 +100,9 @@ export default function SchoolRegister() {
       .catch(() => {});
   }, []);
 
-  // ── Step 1: validate + save school to DB ─────────────────────────────────────
   const validateDetails = () => {
     const errs = {};
-    if (!details.name.trim())     errs.name     = 'School name is required';
+    if (!details.name.trim())     errs.name = 'School name is required';
     if (!details.location.trim()) errs.location = 'Location is required';
     if (!details.phone.trim()) {
       errs.phone = 'Phone number is required';
@@ -94,7 +138,6 @@ export default function SchoolRegister() {
     }
   };
 
-  // ── Step 2: get payload from backend, then POST to PayChangu from the browser ─
   const validateEmail = () => {
     if (!email.trim())                { setEmailError('Email is required');   return false; }
     if (!/\S+@\S+\.\S+/.test(email)) { setEmailError('Enter a valid email'); return false; }
@@ -109,8 +152,6 @@ export default function SchoolRegister() {
     setError(null);
 
     try {
-      // 1. Ask backend to create txRef in DB and return signed payload + secretKey.
-      //    Backend does NOT call PayChangu (Render blocks outbound TCP).
       const backendRes = await fetch(`${API_BASE}/school/${schoolId}/pay`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -128,7 +169,6 @@ export default function SchoolRegister() {
         throw new Error('Invalid response from server');
       }
 
-      // 2. Browser calls PayChangu directly — no Render restriction here.
       const pcRes = await fetch(PAYCHANGU_API, {
         method: 'POST',
         headers: {
@@ -142,7 +182,6 @@ export default function SchoolRegister() {
       const data = await pcRes.json();
 
       if (data?.status === 'success' && data?.data?.checkout_url) {
-        // 3. Hand off to the PayChangu checkout page.
         window.location.href = data.data.checkout_url;
       } else {
         throw new Error(data?.message ?? 'PayChangu did not return a checkout URL');
@@ -154,9 +193,6 @@ export default function SchoolRegister() {
     }
   };
 
-  // ── Result page config ───────────────────────────────────────────────────────
-  //    All action.path values use window.location.href (set below) so React
-  //    Router's stale history doesn't cause a blank page after the redirect loop.
   const schoolLabel = urlSchoolName || details.name || 'Your school';
 
   const resultConfig = {
@@ -164,101 +200,80 @@ export default function SchoolRegister() {
       icon: '🎉',
       title: 'Registration Complete!',
       message: `${schoolLabel} has been successfully registered and activated. You can now log in and start using the platform.`,
-      color: '#2ea043', bg: '#1a3a2a', border: '#2ea043',
-      action: { label: 'Go to Login', path: "/" },
+      color: '#10b981', bg: 'from-emerald-500/20 to-teal-500/20', border: 'emerald-500/30',
+      action: { label: 'Go to Login', path: '/' },
     },
     pending: {
       icon: '⏳',
       title: 'Payment Pending',
       message: 'Your payment is being processed. Your school will be activated automatically once confirmed — this usually takes a few minutes.',
-      color: '#e3a525', bg: '#3a2a1a', border: '#e3a525',
+      color: '#fbbf24', bg: 'from-amber-500/20 to-orange-500/20', border: 'amber-500/30',
       action: { label: 'Back to Home', path: '/' },
     },
     failed: {
       icon: '❌',
       title: 'Payment Failed',
       message: 'Your payment did not go through. No charges were made. Please try again.',
-      color: '#f85149', bg: '#3d1a1a', border: '#f85149',
+      color: '#f87171', bg: 'from-red-500/20 to-pink-500/20', border: 'red-500/30',
       action: { label: 'Try Again', path: '/school/register' },
     },
     error: {
       icon: '⚠️',
       title: 'Something Went Wrong',
       message: 'We could not confirm your payment. Please contact support if you were charged.',
-      color: '#f85149', bg: '#3d1a1a', border: '#f85149',
+      color: '#f87171', bg: 'from-red-500/20 to-pink-500/20', border: 'red-500/30',
       action: { label: 'Back to Home', path: '/' },
     },
   };
 
   const result = resultConfig[urlStatus] ?? resultConfig.error;
 
-  // ── Render ───────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#0d1117] text-[#e6edf3] flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 flex items-center justify-center p-6">
       <div className="w-full max-w-lg">
 
-        {/* Header */}
+        {/* Header with Logo */}
         <div className="text-center mb-8">
-          <div className="text-4xl mb-3">🏫</div>
-          <h1 className="text-2xl font-bold text-[#e6edf3]">School Registration</h1>
-          <p className="text-sm text-[#8b949e] mt-1">
+          <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-emerald-500/25">
+            <MdSchool size={40} className="text-white" />
+          </div>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+            School Registration
+          </h1>
+          <p className="text-gray-400 text-sm mt-2">
             Register your school to access the online library platform
           </p>
         </div>
 
-        {/* Step indicator — steps 1 and 2 only */}
+        {/* Step Indicator */}
         {step < 3 && (
-          <div className="flex items-center justify-center gap-3 mb-8">
-            {[
-              { n: 1, label: 'School Details' },
-              { n: 2, label: 'Payment'        },
-            ].map(({ n, label }, i) => (
-              <React.Fragment key={n}>
-                <div className="flex items-center gap-2">
-                  <div
-                    className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition ${
-                      step === n
-                        ? 'bg-[#2ea043] text-white'
-                        : step > n
-                        ? 'bg-[#2ea04360] text-[#2ea043]'
-                        : 'bg-[#21262d] text-[#6e7681]'
-                    }`}
-                  >
-                    {step > n ? '✓' : n}
-                  </div>
-                  <span
-                    className={`text-xs font-medium hidden sm:block ${
-                      step === n ? 'text-[#e6edf3]' : 'text-[#6e7681]'
-                    }`}
-                  >
-                    {label}
-                  </span>
-                </div>
-                {i === 0 && (
-                  <div
-                    className={`flex-1 h-px max-w-[60px] ${
-                      step > 1 ? 'bg-[#2ea043]' : 'bg-[#21262d]'
-                    }`}
-                  />
-                )}
-              </React.Fragment>
-            ))}
-          </div>
+          <StepIndicator 
+            currentStep={step} 
+            steps={[
+              { number: 1, label: 'School Details' },
+              { number: 2, label: 'Payment' },
+            ]}
+          />
         )}
 
-        {/* ── Step 1: School Details ─────────────────────────────────────────── */}
+        {/* Step 1: School Details */}
         {step === 1 && (
-          <div className="bg-[#161b22] border border-[#21262d] rounded-xl p-6">
-            <h2 className="text-base font-semibold text-[#e6edf3] mb-5">School Information</h2>
+          <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 shadow-xl">
+            <h2 className="text-lg font-semibold text-gray-200 mb-5 flex items-center gap-2">
+              <div className="w-6 h-6 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                <MdSchool size={14} className="text-emerald-400" />
+              </div>
+              School Information
+            </h2>
 
             {error && (
-              <div className="mb-4 px-3 py-2 rounded-lg bg-[#3d1f1f] border border-[#f85149] text-[#f85149] text-xs">
-                {error}
+              <div className="mb-4 px-3 py-2 rounded-xl flex items-center gap-2 bg-red-500/20 border border-red-500/50 text-red-400 text-sm">
+                <FiAlertCircle size={14} /> {error}
               </div>
             )}
 
             <form onSubmit={handleDetailsSubmit} className="space-y-4">
-              <Field label="School Name" required error={detailErrors.name}>
+              <Field label="School Name" required error={detailErrors.name} icon={MdSchool}>
                 <input
                   type="text"
                   value={details.name}
@@ -269,7 +284,7 @@ export default function SchoolRegister() {
                 />
               </Field>
 
-              <Field label="Location" required error={detailErrors.location}>
+              <Field label="Location" required error={detailErrors.location} icon={MdLocationOn}>
                 <input
                   type="text"
                   value={details.location}
@@ -280,7 +295,7 @@ export default function SchoolRegister() {
                 />
               </Field>
 
-              <Field label="Phone Number" required error={detailErrors.phone}>
+              <Field label="Phone Number" required error={detailErrors.phone} icon={MdPhone}>
                 <input
                   type="tel"
                   value={details.phone}
@@ -294,17 +309,17 @@ export default function SchoolRegister() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#2ea043] hover:bg-[#3fb950] text-white font-semibold py-2.5 rounded-lg text-sm transition disabled:opacity-50 mt-2"
+                className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-600 text-white font-semibold py-3 rounded-xl text-sm transition-all disabled:opacity-50 mt-2 shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2"
               >
-                {loading ? 'Saving…' : 'Continue to Payment →'}
+                {loading ? <LoadingSpinner /> : <><FiArrowRight size={14} /> Continue to Payment</>}
               </button>
             </form>
 
-            <p className="text-center text-xs text-[#6e7681] mt-4">
+            <p className="text-center text-xs text-gray-500 mt-4">
               Already registered?{' '}
               <button
                 onClick={() => { window.location.href = LOGIN_PATH; }}
-                className="text-[#2ea043] hover:underline"
+                className="text-emerald-400 hover:text-emerald-300 font-medium transition-colors"
               >
                 Log in here
               </button>
@@ -312,41 +327,50 @@ export default function SchoolRegister() {
           </div>
         )}
 
-        {/* ── Step 2: Payment ────────────────────────────────────────────────── */}
+        {/* Step 2: Payment */}
         {step === 2 && (
-          <div className="bg-[#161b22] border border-[#21262d] rounded-xl p-6">
-            <h2 className="text-base font-semibold text-[#e6edf3] mb-1">Registration Fee</h2>
-            <p className="text-xs text-[#8b949e] mb-5">
+          <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 shadow-xl">
+            <h2 className="text-lg font-semibold text-gray-200 mb-1 flex items-center gap-2">
+              <div className="w-6 h-6 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                <FiCreditCard size={14} className="text-emerald-400" />
+              </div>
+              Registration Fee
+            </h2>
+            <p className="text-xs text-gray-400 mb-5">
               A one-time registration fee is required to activate your school account.
             </p>
 
             {error && (
-              <div className="mb-4 px-3 py-2 rounded-lg bg-[#3d1f1f] border border-[#f85149] text-[#f85149] text-xs">
-                {error}
+              <div className="mb-4 px-3 py-2 rounded-xl flex items-center gap-2 bg-red-500/20 border border-red-500/50 text-red-400 text-sm">
+                <FiAlertCircle size={14} /> {error}
               </div>
             )}
 
-            {/* Fee summary card */}
-            <div className="bg-[#0d1117] border border-[#30363d] rounded-lg p-4 mb-5">
+            {/* Fee Summary Card */}
+            <div className="bg-gray-900/50 border border-gray-700 rounded-xl p-4 mb-5">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm text-[#8b949e]">School</span>
-                <span className="text-sm text-[#e6edf3] font-medium">{details.name}</span>
+                <span className="text-sm text-gray-400 flex items-center gap-2">
+                  <MdSchool size={14} /> School
+                </span>
+                <span className="text-sm text-gray-200 font-medium">{details.name}</span>
               </div>
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm text-[#8b949e]">Location</span>
-                <span className="text-sm text-[#e6edf3]">{details.location}</span>
+                <span className="text-sm text-gray-400 flex items-center gap-2">
+                  <MdLocationOn size={14} /> Location
+                </span>
+                <span className="text-sm text-gray-200">{details.location}</span>
               </div>
-              <div className="border-t border-[#21262d] my-3" />
+              <div className="border-t border-gray-700 my-3" />
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-[#e6edf3]">Registration Fee</span>
-                <span className="text-lg font-bold text-[#2ea043]">
-                  {fee ? `MWK ${fee.amount.toLocaleString()}` : 'Loading…'}
+                <span className="text-sm font-semibold text-gray-200">Registration Fee</span>
+                <span className="text-xl font-bold text-emerald-400">
+                  {fee ? `MWK ${fee.amount.toLocaleString()}` : <LoadingSpinner />}
                 </span>
               </div>
             </div>
 
             <form onSubmit={handlePaySubmit} className="space-y-4">
-              <Field label="Contact Email" required error={emailError}>
+              <Field label="Contact Email" required error={emailError} icon={MdEmail}>
                 <input
                   type="email"
                   value={email}
@@ -355,7 +379,7 @@ export default function SchoolRegister() {
                   className={inputCls}
                   disabled={loading}
                 />
-                <p className="text-[11px] text-[#6e7681] mt-1">
+                <p className="text-xs text-gray-500 mt-1">
                   The payment receipt will be sent to this address.
                 </p>
               </Field>
@@ -363,57 +387,51 @@ export default function SchoolRegister() {
               <button
                 type="submit"
                 disabled={loading || !fee}
-                className="w-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-semibold py-2.5 rounded-lg text-sm transition disabled:opacity-50"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-semibold py-3 rounded-xl text-sm transition-all disabled:opacity-50 shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2"
               >
-                {loading
-                  ? 'Connecting to payment gateway…'
-                  : fee
-                  ? `💳 Pay MWK ${fee.amount.toLocaleString()}`
-                  : 'Loading…'}
+                {loading ? <LoadingSpinner /> : <><FiDollarSign size={14} /> Pay MWK {fee?.amount?.toLocaleString()}</>}
               </button>
             </form>
 
             <button
               onClick={() => setStep(1)}
-              className="w-full mt-3 text-xs text-[#6e7681] hover:text-[#e6edf3] transition"
+              className="w-full mt-3 text-xs text-gray-500 hover:text-gray-300 transition-colors flex items-center justify-center gap-1"
             >
-              ← Back to school details
+              <FiArrowLeft size={12} /> Back to school details
             </button>
 
-            {/* Test mode notice */}
-            <div className="mt-4 px-3 py-2 rounded-lg bg-[#1a2a3a] border border-[#388bfd] text-[#388bfd] text-xs">
-              🧪 <strong>Test mode:</strong> Use card{' '}
-              <span className="font-mono">4242 4242 4242 4242</span>, expiry{' '}
-              <span className="font-mono">12/30</span>, CVC{' '}
-              <span className="font-mono">123</span>, OTP{' '}
-              <span className="font-mono">1234</span>
+            {/* Test Mode Notice */}
+            <div className="mt-5 px-3 py-2 rounded-xl bg-blue-500/10 border border-blue-500/30">
+              <p className="text-xs text-blue-400 flex items-start gap-2">
+                <MdLock size={14} className="flex-shrink-0 mt-0.5" />
+                <span>
+                  <strong>Test mode:</strong> Use card <span className="font-mono">4242 4242 4242 4242</span>, 
+                  expiry <span className="font-mono">12/30</span>, CVC <span className="font-mono">123</span>, 
+                  OTP <span className="font-mono">1234</span>
+                </span>
+              </p>
             </div>
           </div>
         )}
 
-        {/* ── Step 3: Result ──────────────────────────────────────────────────── */}
+        {/* Step 3: Result */}
         {step === 3 && (
-          <div
-            className="rounded-xl p-8 text-center"
-            style={{ backgroundColor: result.bg, border: `1px solid ${result.border}` }}
-          >
-            <div className="text-5xl mb-4">{result.icon}</div>
+          <div className={`bg-gradient-to-br ${result.bg} backdrop-blur-sm border rounded-2xl p-8 text-center shadow-xl animate-fadeIn`} style={{ borderColor: result.border }}>
+            <div className="text-6xl mb-4">{result.icon}</div>
             <h2 className="text-xl font-bold mb-3" style={{ color: result.color }}>
               {result.title}
             </h2>
-            <p className="text-sm text-[#8b949e] mb-6">{result.message}</p>
+            <p className="text-sm text-gray-300 mb-5">{result.message}</p>
 
             {urlTxRef && (
-              <p className="text-xs text-[#6e7681] mb-6">
-                Reference:{' '}
-                <span className="font-mono text-[#e6edf3]">{urlTxRef}</span>
+              <p className="text-xs text-gray-400 mb-5">
+                Reference: <span className="font-mono text-gray-200">{urlTxRef}</span>
               </p>
             )}
 
-            {/* ✅ FIX: window.location.href instead of navigate() */}
             <button
               onClick={() => { window.location.href = result.action.path; }}
-              className="w-full py-2.5 rounded-lg text-sm font-semibold text-white transition"
+              className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all transform hover:scale-[1.02]"
               style={{ backgroundColor: result.color }}
             >
               {result.action.label}
@@ -422,7 +440,7 @@ export default function SchoolRegister() {
             {urlStatus === 'failed' && (
               <button
                 onClick={() => { window.location.href = '/school/register'; }}
-                className="w-full mt-3 py-2 rounded-lg text-xs text-[#8b949e] border border-[#21262d] hover:border-[#6e7681] transition"
+                className="w-full mt-3 py-2.5 rounded-xl text-xs text-gray-400 border border-gray-700 hover:border-gray-600 hover:text-gray-200 transition-all"
               >
                 Start over
               </button>
@@ -431,6 +449,16 @@ export default function SchoolRegister() {
         )}
 
       </div>
+
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 }
