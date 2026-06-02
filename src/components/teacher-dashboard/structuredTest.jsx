@@ -1,15 +1,16 @@
+// structuredTest.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { 
   FiBook, FiClock, FiCalendar, FiAward, FiCheckCircle, 
   FiXCircle, FiAlertCircle, FiPlus, FiEdit, FiEye, 
   FiSend, FiSave, FiTrash2, FiArrowLeft, FiArrowRight,
   FiLoader, FiCheck, FiUser, FiUsers, FiTrendingUp,
-  FiBarChart2, FiFileText, FiDownload, FiUpload
+  FiBarChart2, FiFileText, FiDownload, FiUpload, FiStar
 } from "react-icons/fi";
 import { 
   MdOutlineQuiz, MdOutlineDescription, MdOutlineSubject,
   MdOutlineSchool, MdOutlineTimer, MdOutlineQuestionAnswer,
-  MdOutlineTipsAndUpdates, MdOutlineMarkEmailRead
+  MdOutlineTipsAndUpdates, MdOutlineMarkEmailRead, MdAutoAwesome
 } from "react-icons/md";
 import { FaRobot, FaUserGraduate, FaChalkboardTeacher } from "react-icons/fa";
 import { IoStatsChart } from "react-icons/io5";
@@ -22,8 +23,8 @@ const SUBJECT_TOPICS = {
   Chemistry:         ["Atomic Structure","Periodic Table","Chemical Bonding","Acids and Bases","Redox Reactions","Electrochemistry","Rates of Reaction","Organic Chemistry"],
   Physics:           ["Motion","Newton's Laws","Work, Energy, Power","Waves","Light","Electricity","Magnetism","Radioactivity"],
   English:           ["Comprehension","Essay Writing","Grammar","Literature","Report Writing","Letter Writing"],
-  Geography:         ["Map Reading","Climate","Physical Features of Malawi","Agriculture","Population","Environmental Conservation"],
-  History:           ["Pre-colonial Malawi","Colonial Rule","Independence","Post-Independence"],
+  Geography:         ["Map Reading","Climate","Physical Features","Agriculture","Population","Environmental Conservation"],
+  History:           ["Pre-colonial","Colonial Rule","Independence","Post-Independence"],
   "Civic Education": ["Human Rights","Constitution","Government","Democracy","Gender Equality"],
   "Computer Studies":["Hardware","Software","Networking","Programming","Web Design","Data Representation"],
 };
@@ -35,87 +36,64 @@ const userFromStorage = () => {
   try { return JSON.parse(localStorage.getItem("user")) ?? {}; } catch { return {}; }
 };
 
-// ── Small reusable components ─────────────────────────────────────────────────
-
 function Spinner() {
   return (
-    <div style={{ textAlign: "center", padding: "3rem 0" }}>
-      <FiLoader size={32} style={{ color: "#2ea043", margin: "0 auto 0.75rem", animation: "spin 0.8s linear infinite" }} />
-      <p style={{ color: "white", fontSize: 14 }}>Loading...</p>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    <div className="text-center py-12">
+      <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+      <p className="text-gray-400 text-sm">Loading...</p>
     </div>
   );
 }
 
-function Badge({ children, color = "#2ea043", bg = "#1a3a2a" }) {
+function Badge({ children, color = "#10b981", bg = "rgba(16,185,129,0.15)" }) {
   return (
-    <span style={{
-      display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 10px", borderRadius: 99,
-      fontSize: 12, fontWeight: 600, color, backgroundColor: bg, border: `1px solid ${color}40`,
-    }}>
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
+      style={{ backgroundColor: bg, color: color }}>
       {children}
     </span>
   );
 }
 
 function Alert({ type = "info", children }) {
-  const map = {
-    info:    { bg: "#0d2a3d", border: "#1f6feb", color: "#58a6ff", icon: <FiAlertCircle size={14} /> },
-    success: { bg: "#1a3a2a", border: "#2ea043", color: "#3fb950", icon: <FiCheckCircle size={14} /> },
-    warning: { bg: "#3d2e0a", border: "#e3b341", color: "#e3b341", icon: <FiAlertCircle size={14} /> },
-    error:   { bg: "#3d1a1a", border: "#f85149", color: "#f85149", icon: <FiXCircle size={14} /> },
+  const config = {
+    info:    { bg: "from-blue-500/10 to-blue-600/10", border: "blue-500/30", color: "#60a5fa", icon: <FiAlertCircle size={14} /> },
+    success: { bg: "from-emerald-500/10 to-teal-500/10", border: "emerald-500/30", color: "#10b981", icon: <FiCheckCircle size={14} /> },
+    warning: { bg: "from-amber-500/10 to-orange-500/10", border: "amber-500/30", color: "#fbbf24", icon: <FiAlertCircle size={14} /> },
+    error:   { bg: "from-red-500/10 to-pink-500/10", border: "red-500/30", color: "#f87171", icon: <FiXCircle size={14} /> },
   };
-  const s = map[type];
+  const c = config[type];
   return (
-    <div style={{
-      background: s.bg, border: `1px solid ${s.border}`,
-      color: s.color, borderRadius: 8, padding: "10px 14px",
-      fontSize: 13, marginBottom: 12, display: "flex", alignItems: "center", gap: 8,
-    }}>
-      {s.icon}
+    <div className={`p-3 rounded-xl border bg-gradient-to-r ${c.bg} border-${c.border} flex items-center gap-2.5 text-sm mb-4`}
+      style={{ color: c.color }}>
+      {c.icon}
       <span>{children}</span>
     </div>
   );
 }
 
-function Card({ children, style = {} }) {
+function Card({ children, className = "" }) {
   return (
-    <div style={{
-      background: "#161b22", border: "1px solid #21262d",
-      borderRadius: 10, padding: "1.25rem", ...style,
-    }}>
+    <div className={`bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-5 ${className}`}>
       {children}
     </div>
   );
 }
 
-function Btn({ children, onClick, variant = "primary", disabled = false, small = false, style = {} }) {
+function Btn({ children, onClick, variant = "primary", disabled = false, small = false, className = "" }) {
   const variants = {
-    primary:  { bg: "#2ea043", color: "white", border: "#2ea043" },
-    secondary:{ bg: "#21262d", color: "white", border: "#30363d" },
-    danger:   { bg: "#3d1a1a", color: "#f85149", border: "#f85149" },
-    ghost:    { bg: "transparent", color: "white", border: "#21262d" },
-    info:     { bg: "#0d2a3d", color: "#58a6ff", border: "#1f6feb" },
+    primary:   "bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-500 hover:to-emerald-600 shadow-lg shadow-emerald-500/25",
+    secondary: "bg-gray-700 text-gray-200 hover:bg-gray-600",
+    danger:    "bg-red-500/20 border border-red-500/50 text-red-400 hover:bg-red-500/30",
+    ghost:     "bg-transparent text-gray-400 hover:text-gray-200 border border-gray-700 hover:border-gray-600",
+    info:      "bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/25",
   };
-  const v = variants[variant] || variants.primary;
   return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      style={{
-        background: v.bg, color: v.color, border: `1px solid ${v.border}`,
-        borderRadius: 7, padding: small ? "4px 10px" : "7px 16px",
-        fontSize: small ? 12 : 13, fontWeight: 600, cursor: disabled ? "not-allowed" : "pointer",
-        opacity: disabled ? 0.5 : 1, transition: "all 0.15s", display: "inline-flex", alignItems: "center", gap: 6,
-        ...style,
-      }}
-    >
+    <button onClick={onClick} disabled={disabled}
+      className={`${variants[variant]} ${small ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm"} rounded-lg font-medium transition-all duration-200 flex items-center gap-2 disabled:opacity-50 ${className}`}>
       {children}
     </button>
   );
 }
-
-// ── TEACHER: Generate & Edit Questions ────────────────────────────────────────
 
 function QuestionEditor({ questions, onChange }) {
   const update = (i, field, value) => {
@@ -126,7 +104,6 @@ function QuestionEditor({ questions, onChange }) {
   };
 
   const remove = (i) => onChange(questions.filter((_, idx) => idx !== i));
-
   const addBlank = () =>
     onChange([
       ...questions,
@@ -138,68 +115,55 @@ function QuestionEditor({ questions, onChange }) {
   return (
     <div>
       {questions.map((q, i) => (
-        <Card key={q.id} style={{ marginBottom: 12 }}>
-          <div style={{ display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 10 }}>
-            <span style={{ color: "#2ea043", fontWeight: 700, fontSize: 14, paddingTop: 3 }}>Q{i + 1}</span>
+        <Card key={q.id} className="mb-3">
+          <div className="flex items-start gap-3 mb-3">
+            <div className="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-bold flex-shrink-0">
+              {i + 1}
+            </div>
             <textarea
               value={q.text}
               onChange={e => update(i, "text", e.target.value)}
               placeholder="Question text..."
               rows={2}
-              style={{
-                flex: 1, background: "#0d1117", border: "1px solid #30363d",
-                borderRadius: 6, color: "white", padding: "7px 10px", fontSize: 13, resize: "vertical",
-              }}
+              className="flex-1 bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 resize-vertical"
             />
             <Btn variant="danger" small onClick={() => remove(i)}>
               <FiTrash2 size={12} /> Remove
             </Btn>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 8 }}>
+          <div className="grid grid-cols-3 gap-3 mb-3">
             <div>
-              <label style={lbl}>Type</label>
-              <select
-                value={q.type}
-                onChange={e => update(i, "type", e.target.value)}
-                style={sel}
-              >
+              <label className="text-xs text-gray-400 block mb-1">Type</label>
+              <select value={q.type} onChange={e => update(i, "type", e.target.value)}
+                className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-emerald-500">
                 <option value="short">Short answer</option>
                 <option value="structured">Structured</option>
                 <option value="long">Long answer</option>
               </select>
             </div>
             <div>
-              <label style={lbl}>Marks</label>
-              <input
-                type="number" min={1} max={20}
-                value={q.marks}
+              <label className="text-xs text-gray-400 block mb-1">Marks</label>
+              <input type="number" min={1} max={20} value={q.marks}
                 onChange={e => update(i, "marks", e.target.value)}
-                style={inp}
-              />
+                className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-emerald-500" />
             </div>
             <div>
-              <label style={lbl}>Total so far</label>
-              <div style={{ color: "#2ea043", fontWeight: 700, paddingTop: 8, fontSize: 13 }}>
-                {totalMarks} marks
-              </div>
+              <label className="text-xs text-gray-400 block mb-1">Running Total</label>
+              <div className="text-emerald-400 font-semibold text-sm py-1.5">{totalMarks} marks</div>
             </div>
           </div>
 
           <div>
-            <label style={lbl}>
-              <MdOutlineTipsAndUpdates size={12} style={{ marginRight: 4 }} />
-              Marking guidance (private)
+            <label className="text-xs text-gray-400 block mb-1 flex items-center gap-1">
+              <MdOutlineTipsAndUpdates size={12} /> Marking guidance (private)
             </label>
             <textarea
               value={q.markingGuidance || ""}
               onChange={e => update(i, "markingGuidance", e.target.value)}
               rows={2}
               placeholder="Key points the answer must include..."
-              style={{
-                width: "100%", background: "#0d1117", border: "1px solid #30363d",
-                borderRadius: 6, color: "white", padding: "6px 10px", fontSize: 12, resize: "vertical",
-              }}
+              className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 resize-vertical"
             />
           </div>
         </Card>
@@ -210,8 +174,6 @@ function QuestionEditor({ questions, onChange }) {
     </div>
   );
 }
-
-// ── TEACHER: Create Test Page ─────────────────────────────────────────────────
 
 function CreateTestPage({ onBack, editingTest = null }) {
   const [step, setStep]           = useState(editingTest ? 2 : 1);
@@ -236,7 +198,8 @@ function CreateTestPage({ onBack, editingTest = null }) {
 
   const generate = async () => {
     if (!genForm.subject || !genForm.form || !genForm.topic) {
-      setError("Please fill in subject, form, and topic."); return;
+      setError("Please fill in subject, form, and topic.");
+      return;
     }
     setGen(true); setError("");
     try {
@@ -261,7 +224,8 @@ function CreateTestPage({ onBack, editingTest = null }) {
 
   const save = async (publishStatus) => {
     if (!meta.title || questions.length === 0) {
-      setError("Title and at least one question are required."); return;
+      setError("Title and at least one question are required.");
+      return;
     }
     setSaving(true); setError("");
     try {
@@ -280,55 +244,61 @@ function CreateTestPage({ onBack, editingTest = null }) {
 
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+      <div className="flex items-center gap-3 mb-5">
         <Btn variant="ghost" onClick={() => onBack(false)}>
           <FiArrowLeft size={14} /> Back
         </Btn>
-        <h2 style={{ color: "white", fontSize: 18, fontWeight: 600, margin: 0 }}>
+        <h2 className="text-xl font-semibold text-gray-200">
           {editingTest ? "Edit Test" : "Create New Test"}
         </h2>
       </div>
 
       {error && <Alert type="error">{error}</Alert>}
 
-      {/* Step 1: AI generation */}
       {step === 1 && (
         <Card>
-          <h3 style={{ color: "#2ea043", fontSize: 15, fontWeight: 600, marginTop: 0, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-            <FaRobot size={18} /> Generate questions with AI
+          <h3 className="text-base font-semibold mb-4 flex items-center gap-2 text-gray-200">
+            <div className="w-7 h-7 rounded-lg bg-purple-500/20 flex items-center justify-center">
+              <FaRobot size={14} className="text-purple-400" />
+            </div>
+            Generate questions with AI
           </h3>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label style={lbl}>Subject</label>
-              <select value={genForm.subject} onChange={e => setGenForm(f => ({ ...f, subject: e.target.value, topic: "" }))} style={sel}>
+              <label className="text-xs text-gray-400 block mb-1">Subject</label>
+              <select value={genForm.subject} onChange={e => setGenForm(f => ({ ...f, subject: e.target.value, topic: "" }))}
+                className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
                 <option value="">Select subject</option>
                 {subjects.map(s => <option key={s}>{s}</option>)}
               </select>
             </div>
             <div>
-              <label style={lbl}>Form / Level</label>
-              <select value={genForm.form} onChange={e => setGenForm(f => ({ ...f, form: e.target.value }))} style={sel}>
+              <label className="text-xs text-gray-400 block mb-1">Form / Level</label>
+              <select value={genForm.form} onChange={e => setGenForm(f => ({ ...f, form: e.target.value }))}
+                className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
                 <option value="">Select form</option>
                 {["Form 1","Form 2","Form 3","Form 4"].map(f => <option key={f}>{f}</option>)}
               </select>
             </div>
             <div>
-              <label style={lbl}>Topic</label>
+              <label className="text-xs text-gray-400 block mb-1">Topic</label>
               <select value={genForm.topic} onChange={e => setGenForm(f => ({ ...f, topic: e.target.value }))}
-                disabled={!genForm.subject} style={sel}>
+                disabled={!genForm.subject}
+                className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 disabled:opacity-50">
                 <option value="">Select topic</option>
                 {topics.map(t => <option key={t}>{t}</option>)}
               </select>
             </div>
             <div>
-              <label style={lbl}>Number of questions</label>
+              <label className="text-xs text-gray-400 block mb-1">Number of questions</label>
               <input type="number" min={2} max={10} value={genForm.count}
-                onChange={e => setGenForm(f => ({ ...f, count: Number(e.target.value) }))} style={inp} />
+                onChange={e => setGenForm(f => ({ ...f, count: Number(e.target.value) }))}
+                className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
             </div>
           </div>
-          <div style={{ display: "flex", gap: 10 }}>
+          <div className="flex gap-3">
             <Btn onClick={generate} disabled={generating}>
-              {generating ? <FiLoader size={14} className="spin" /> : <FaRobot size={14} />}
+              {generating ? <FiLoader size={14} className="animate-spin" /> : <MdAutoAwesome size={14} />}
               {generating ? " Generating..." : " Generate questions"}
             </Btn>
             <Btn variant="secondary" onClick={() => setStep(2)}>
@@ -338,59 +308,70 @@ function CreateTestPage({ onBack, editingTest = null }) {
         </Card>
       )}
 
-      {/* Step 2: Edit questions + meta */}
       {step === 2 && (
         <div>
-          <Card style={{ marginBottom: 16 }}>
-            <h3 style={{ color: "#2ea043", fontSize: 15, fontWeight: 600, marginTop: 0, marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
-              <MdOutlineDescription size={18} /> Test details
+          <Card className="mb-4">
+            <h3 className="text-base font-semibold mb-4 flex items-center gap-2 text-gray-200">
+              <div className="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                <MdOutlineDescription size={14} className="text-emerald-400" />
+              </div>
+              Test Details
             </h3>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
-              <div style={{ gridColumn: "1/-1" }}>
-                <label style={lbl}>Test title *</label>
-                <input value={meta.title} onChange={e => setMeta(m => ({ ...m, title: e.target.value }))} style={inp} placeholder="e.g. Biology End of Term Test" />
-              </div>
+            <div className="space-y-3">
               <div>
-                <label style={lbl}>Subject</label>
-                <input value={meta.subject} onChange={e => setMeta(m => ({ ...m, subject: e.target.value }))} style={inp} />
+                <label className="text-xs text-gray-400 block mb-1">Test title *</label>
+                <input value={meta.title} onChange={e => setMeta(m => ({ ...m, title: e.target.value }))}
+                  className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
+                  placeholder="e.g. Biology End of Term Test" />
               </div>
-              <div>
-                <label style={lbl}>Form</label>
-                <input value={meta.form} onChange={e => setMeta(m => ({ ...m, form: e.target.value }))} style={inp} />
-              </div>
-              <div>
-                <label style={lbl}>Duration</label>
-                <input value={meta.duration} onChange={e => setMeta(m => ({ ...m, duration: e.target.value }))} style={inp} placeholder="60 minutes" />
-              </div>
-              <div>
-                <label style={lbl}>Total marks</label>
-                <div style={{ color: "#2ea043", fontWeight: 700, paddingTop: 10, fontSize: 15 }}>
-                  {questions.reduce((s, q) => s + (q.marks || 0), 0)}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-gray-400 block mb-1">Subject</label>
+                  <input value={meta.subject} onChange={e => setMeta(m => ({ ...m, subject: e.target.value }))}
+                    className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-400 block mb-1">Form</label>
+                  <input value={meta.form} onChange={e => setMeta(m => ({ ...m, form: e.target.value }))}
+                    className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-400 block mb-1">Duration</label>
+                  <input value={meta.duration} onChange={e => setMeta(m => ({ ...m, duration: e.target.value }))}
+                    className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
+                    placeholder="60 minutes" />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-400 block mb-1">Total marks</label>
+                  <div className="text-emerald-400 font-bold text-lg py-1.5">
+                    {questions.reduce((s, q) => s + (q.marks || 0), 0)}
+                  </div>
                 </div>
               </div>
-              <div style={{ gridColumn: "1/-1" }}>
-                <label style={lbl}>Instructions to students</label>
+              <div>
+                <label className="text-xs text-gray-400 block mb-1">Instructions to students</label>
                 <textarea value={meta.instructions} onChange={e => setMeta(m => ({ ...m, instructions: e.target.value }))}
-                  rows={2} style={{ ...inp, resize: "vertical" }} />
+                  rows={2} className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 resize-vertical" />
               </div>
             </div>
           </Card>
 
-          <Card style={{ marginBottom: 16 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-              <h3 style={{ color: "white", fontSize: 15, fontWeight: 600, margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
-                <MdOutlineQuestionAnswer size={18} /> Questions ({questions.length})
+          <Card className="mb-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-semibold flex items-center gap-2 text-gray-200">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                  <MdOutlineQuestionAnswer size={14} className="text-emerald-400" />
+                </div>
+                Questions ({questions.length})
               </h3>
-              {step === 2 && (
-                <Btn variant="ghost" small onClick={() => setStep(1)}>
-                  <FaRobot size={12} /> Re-generate
-                </Btn>
-              )}
+              <Btn variant="ghost" small onClick={() => setStep(1)}>
+                <FaRobot size={12} /> Re-generate
+              </Btn>
             </div>
             <QuestionEditor questions={questions} onChange={setQuestions} />
           </Card>
 
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <div className="flex gap-3 flex-wrap">
             <Btn onClick={() => save("DRAFT")} disabled={saving} variant="secondary">
               <FiSave size={14} /> Save as draft
             </Btn>
@@ -409,13 +390,11 @@ function CreateTestPage({ onBack, editingTest = null }) {
   );
 }
 
-// ── TEACHER: Mark a Submission ────────────────────────────────────────────────
-
 function MarkSubmission({ submission, test, onBack }) {
-  const [marks, setMarks]     = useState(() =>
+  const [marks, setMarks] = useState(() =>
     (test.questions ?? []).map(q => {
       const existing = submission.finalMarks?.find(m => m.questionId === q.id);
-      const ai       = submission.aiMarking?.find(m => m.questionId === q.id);
+      const ai = submission.aiMarking?.find(m => m.questionId === q.id);
       return {
         questionId: q.id,
         mark: existing?.mark ?? ai?.suggestedMark ?? 0,
@@ -424,9 +403,9 @@ function MarkSubmission({ submission, test, onBack }) {
     })
   );
   const [comment, setComment] = useState(submission.teacherComment ?? "");
-  const [saving, setSaving]   = useState(false);
-  const [aiLoading, setAiLoad]= useState(false);
-  const [error, setError]     = useState("");
+  const [saving, setSaving] = useState(false);
+  const [aiLoading, setAiLoad] = useState(false);
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   const runAI = async () => {
@@ -441,7 +420,7 @@ function MarkSubmission({ submission, test, onBack }) {
         const ai = data.aiMarking?.find(a => a.questionId === m.questionId);
         return ai ? { ...m, mark: ai.suggestedMark, feedback: ai.feedback } : m;
       }));
-      setSuccess("AI suggestions loaded — review and adjust before saving.");
+      setSuccess("AI suggestions loaded — review and adjust before saving");
     } catch (e) {
       setError(e.message);
     } finally { setAiLoad(false); }
@@ -469,134 +448,122 @@ function MarkSubmission({ submission, test, onBack }) {
   };
 
   const totalAwarded = marks.reduce((s, m) => s + (m.mark || 0), 0);
-  const pct          = test.totalMarks ? Math.round((totalAwarded / test.totalMarks) * 100) : 0;
-  const studentName  = submission.student
+  const pct = test.totalMarks ? Math.round((totalAwarded / test.totalMarks) * 100) : 0;
+  const studentName = submission.student
     ? `${submission.student.firstName} ${submission.student.lastName}`
     : `Student ${submission.studentId}`;
 
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+      <div className="flex items-center gap-3 mb-5">
         <Btn variant="ghost" onClick={() => onBack(false)}>
           <FiArrowLeft size={14} /> Back
         </Btn>
         <div>
-          <h2 style={{ color: "white", fontSize: 17, fontWeight: 600, margin: 0 }}>
+          <h2 className="text-xl font-semibold text-gray-200">
             Marking: {studentName}
           </h2>
-          <p style={{ color: "white", fontSize: 12, margin: 0 }}>
+          <p className="text-xs text-gray-400">
             {test.title} · Submitted {new Date(submission.submittedAt).toLocaleDateString()}
           </p>
         </div>
       </div>
 
-      {error   && <Alert type="error">{error}</Alert>}
+      {error && <Alert type="error">{error}</Alert>}
       {success && <Alert type="success">{success}</Alert>}
 
-      <div style={{ display: "flex", gap: 10, marginBottom: 16, alignItems: "center", flexWrap: "wrap" }}>
+      <div className="flex gap-3 mb-5 items-center flex-wrap">
         <Btn variant="info" onClick={runAI} disabled={aiLoading}>
-          {aiLoading ? <FiLoader size={14} /> : <FaRobot size={14} />}
+          {aiLoading ? <FiLoader size={14} className="animate-spin" /> : <FaRobot size={14} />}
           {aiLoading ? " AI is marking..." : " Get AI suggestions"}
         </Btn>
-        <span style={{ color: "white", fontSize: 13 }}>or mark manually below</span>
-        <span style={{ marginLeft: "auto", color: "#2ea043", fontWeight: 700, fontSize: 16 }}>
-          {totalAwarded} / {test.totalMarks ?? "?"} marks ({pct}%)
-        </span>
+        <span className="text-gray-400 text-sm">or mark manually below</span>
+        <div className="ml-auto text-right">
+          <div className="text-2xl font-bold text-emerald-400">{totalAwarded} / {test.totalMarks ?? "?"}</div>
+          <div className="text-xs text-gray-400">{pct}% of total marks</div>
+        </div>
       </div>
 
       {test.questions?.map((q, i) => {
-        const answer  = submission.answers?.find(a => a.questionId === q.id)?.answer ?? "(no answer)";
-        const ai      = submission.aiMarking?.find(a => a.questionId === q.id);
-        const m       = marks[i];
+        const answer = submission.answers?.find(a => a.questionId === q.id)?.answer ?? "(no answer)";
+        const ai = submission.aiMarking?.find(a => a.questionId === q.id);
+        const m = marks[i];
 
         return (
-          <Card key={q.id} style={{ marginBottom: 14 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
-              <p style={{ color: "white", fontWeight: 600, fontSize: 14, margin: 0, flex: 1, paddingRight: 16 }}>
-                Q{i + 1}. {q.text}
+          <Card key={q.id} className="mb-4">
+            <div className="flex justify-between items-start mb-3">
+              <p className="text-gray-200 font-medium flex-1 pr-4">
+                Q{i+1}. {q.text}
               </p>
               <Badge>{q.marks} marks</Badge>
             </div>
 
-            <div style={{ background: "#0d1117", borderRadius: 6, padding: "10px 12px", marginBottom: 10, border: "1px solid #21262d" }}>
-              <p style={{ color: "white", fontSize: 11, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: 0.5 }}>Student answer</p>
-              <p style={{ color: "white", fontSize: 13, margin: 0, whiteSpace: "pre-wrap" }}>{answer}</p>
+            <div className="bg-gray-900/50 rounded-lg p-3 mb-3 border border-gray-700">
+              <p className="text-gray-400 text-xs mb-1 uppercase tracking-wide">Student answer</p>
+              <p className="text-gray-200 text-sm whitespace-pre-wrap">{answer}</p>
             </div>
 
             {q.markingGuidance && (
-              <div style={{ background: "#1a3a2a", borderRadius: 6, padding: "8px 12px", marginBottom: 10, border: "1px solid #2ea04340" }}>
-                <p style={{ color: "white", fontSize: 11, margin: "0 0 3px", textTransform: "uppercase", letterSpacing: 0.5 }}>Marking guidance</p>
-                <p style={{ color: "#3fb950", fontSize: 12, margin: 0 }}>{q.markingGuidance}</p>
+              <div className="bg-emerald-500/10 rounded-lg p-3 mb-3 border border-emerald-500/30">
+                <p className="text-emerald-400 text-xs mb-1 uppercase tracking-wide">Marking guidance</p>
+                <p className="text-emerald-300 text-xs">{q.markingGuidance}</p>
               </div>
             )}
 
             {ai && (
-              <div style={{ background: "#0d2a3d", borderRadius: 6, padding: "8px 12px", marginBottom: 10, border: "1px solid #1f6feb40" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                  <span style={{ color: "#58a6ff", fontSize: 11, fontWeight: 600, textTransform: "uppercase", display: "flex", alignItems: "center", gap: 4 }}>
+              <div className="bg-blue-500/10 rounded-lg p-3 mb-3 border border-blue-500/30">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-blue-400 text-xs font-medium uppercase tracking-wide flex items-center gap-1">
                     <FaRobot size={10} /> AI suggests
                   </span>
-                  <div style={{ display: "flex", gap: 6 }}>
-                    <Badge color="#58a6ff" bg="#0d2a3d">{ai.suggestedMark}/{ai.maxMark}</Badge>
-                    <Badge
-                      color={ai.confidence==="high"?"#3fb950":ai.confidence==="medium"?"#e3b341":"#f85149"}
-                      bg="#0d1117"
-                    >
+                  <div className="flex gap-2">
+                    <Badge color="#60a5fa" bg="rgba(96,165,250,0.15)">{ai.suggestedMark}/{ai.maxMark}</Badge>
+                    <Badge color={ai.confidence==="high"?"#10b981":ai.confidence==="medium"?"#fbbf24":"#f87171"}>
                       {ai.confidence} confidence
                     </Badge>
                   </div>
                 </div>
-                <p style={{ color: "white", fontSize: 12, margin: 0 }}>{ai.feedback}</p>
+                <p className="text-gray-300 text-xs">{ai.feedback}</p>
               </div>
             )}
 
-            <div style={{ display: "grid", gridTemplateColumns: "100px 1fr", gap: 10 }}>
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label style={lbl}>Mark awarded</label>
+                <label className="text-xs text-gray-400 block mb-1">Mark awarded</label>
                 <input type="number" min={0} max={q.marks}
                   value={m?.mark ?? 0}
                   onChange={e => updateMark(i, "mark", e.target.value)}
-                  style={{ ...inp, width: "100%" }}
-                />
+                  className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
               </div>
               <div>
-                <label style={lbl}>Feedback to student</label>
-                <input
-                  value={m?.feedback ?? ""}
+                <label className="text-xs text-gray-400 block mb-1">Feedback to student</label>
+                <input value={m?.feedback ?? ""}
                   onChange={e => updateMark(i, "feedback", e.target.value)}
                   placeholder="Write feedback..."
-                  style={{ ...inp, width: "100%" }}
-                />
+                  className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
               </div>
             </div>
           </Card>
         );
       })}
 
-      <Card style={{ marginBottom: 16 }}>
-        <label style={{ ...lbl, display: "block", marginBottom: 6 }}>Overall teacher comment</label>
+      <Card className="mb-4">
+        <label className="text-xs text-gray-400 block mb-2">Overall teacher comment</label>
         <textarea value={comment} onChange={e => setComment(e.target.value)} rows={3}
           placeholder="Overall comments on student performance..."
-          style={{ ...inp, width: "100%", resize: "vertical" }} />
+          className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 resize-vertical" />
       </Card>
 
-      <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-        <Btn onClick={save} disabled={saving}>
-          {saving ? <FiLoader size={14} /> : <FiCheck size={14} />}
-          {saving ? " Saving..." : ` Save marks (${totalAwarded}/${test.totalMarks})`}
-        </Btn>
-        <span style={{ color: "white", fontSize: 13 }}>
-          Student will see results once saved.
-        </span>
-      </div>
+      <Btn onClick={save} disabled={saving}>
+        {saving ? <FiLoader size={14} className="animate-spin" /> : <FiCheck size={14} />}
+        {saving ? " Saving..." : ` Save marks (${totalAwarded}/${test.totalMarks})`}
+      </Btn>
     </div>
   );
 }
 
-// ── TEACHER: Test Submissions List ────────────────────────────────────────────
-
 function SubmissionsView({ test, onBack }) {
-  const [subs, setSubs]       = useState([]);
+  const [subs, setSubs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [marking, setMarking] = useState(null);
 
@@ -615,57 +582,54 @@ function SubmissionsView({ test, onBack }) {
     return <MarkSubmission submission={marking} test={test} onBack={(refresh) => { setMarking(null); if (refresh) load(); }} />;
   }
 
-  const marked   = subs.filter(s => s.status === "MARKED").length;
-  const pending  = subs.length - marked;
+  const marked = subs.filter(s => s.status === "MARKED").length;
+  const pending = subs.length - marked;
 
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+      <div className="flex items-center gap-3 mb-5">
         <Btn variant="ghost" onClick={onBack}>
           <FiArrowLeft size={14} /> Back
         </Btn>
         <div>
-          <h2 style={{ color: "white", fontSize: 17, fontWeight: 600, margin: 0 }}>{test.title}</h2>
-          <p style={{ color: "white", fontSize: 12, margin: 0 }}>
+          <h2 className="text-xl font-semibold text-gray-200">{test.title}</h2>
+          <p className="text-xs text-gray-400">
             {subs.length} submissions · {marked} marked · {pending} pending
           </p>
         </div>
       </div>
 
       {loading ? <Spinner /> : subs.length === 0 ? (
-        <Card>
-          <p style={{ color: "white", textAlign: "center", padding: "2rem 0", margin: 0 }}>
-            No submissions yet.
-          </p>
+        <Card className="text-center py-8">
+          <p className="text-gray-400">No submissions yet</p>
         </Card>
       ) : (
-        <div>
+        <div className="space-y-3">
           {subs.map(s => {
             const name = s.student ? `${s.student.firstName} ${s.student.lastName}` : `Student ${s.studentId}`;
             return (
-              <Card key={s.id} style={{ marginBottom: 10 }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+              <Card key={s.id} className="hover:border-gray-600 transition-all">
+                <div className="flex items-center justify-between flex-wrap gap-3">
                   <div>
-                    <p style={{ color: "white", fontWeight: 600, margin: "0 0 4px", fontSize: 14, display: "flex", alignItems: "center", gap: 6 }}>
-                      <FiUser size={14} /> {name}
+                    <p className="text-gray-200 font-medium flex items-center gap-2">
+                      <FiUser size={14} className="text-gray-400" /> {name}
                     </p>
-                    <div style={{ display: "flex", gap: 8 }}>
+                    <div className="flex gap-2 mt-1">
                       {s.status === "MARKED" ? (
                         <>
-                          <Badge color="#3fb950" bg="#1a3a2a">Marked</Badge>
-                          <Badge color="#58a6ff" bg="#0d2a3d">{s.totalScore}/{test.totalMarks} — {s.percentage}%</Badge>
+                          <Badge color="#10b981">✓ Marked</Badge>
+                          <Badge color="#60a5fa">{s.totalScore}/{test.totalMarks} — {s.percentage}%</Badge>
                         </>
                       ) : (
-                        <Badge color="#e3b341" bg="#3d2e0a">Awaiting marking</Badge>
+                        <Badge color="#fbbf24">⏳ Awaiting marking</Badge>
                       )}
-                      <span style={{ color: "white", fontSize: 12 }}>
-                        Submitted {new Date(s.submittedAt).toLocaleDateString()}
+                      <span className="text-xs text-gray-400">
+                        {new Date(s.submittedAt).toLocaleDateString()}
                       </span>
                     </div>
                   </div>
                   <Btn small onClick={() => setMarking(s)}>
-                    {s.status === "MARKED" ? <FiEdit size={12} /> : <FiEdit size={12} />}
-                    {s.status === "MARKED" ? " Review / Edit marks" : " Mark"}
+                    <FiEdit size={12} /> {s.status === "MARKED" ? "Review" : "Mark"}
                   </Btn>
                 </div>
               </Card>
@@ -677,12 +641,10 @@ function SubmissionsView({ test, onBack }) {
   );
 }
 
-// ── TEACHER: Dashboard ────────────────────────────────────────────────────────
-
 function TeacherTestsView() {
-  const [tests, setTests]     = useState([]);
+  const [tests, setTests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [view, setView]       = useState("list");
+  const [view, setView] = useState("list");
   const [selected, setSelected] = useState(null);
 
   const load = async () => {
@@ -700,67 +662,80 @@ function TeacherTestsView() {
   if (view === "edit" && selected) return <CreateTestPage editingTest={selected} onBack={(refresh) => { setView("list"); setSelected(null); if (refresh) load(); }} />;
   if (view === "submissions" && selected) return <SubmissionsView test={selected} onBack={() => { setView("list"); setSelected(null); load(); }} />;
 
-  const statusColor = { DRAFT: "#8b949e", PUBLISHED: "#2ea043", CLOSED: "#f85149" };
-  const statusBg    = { DRAFT: "#21262d", PUBLISHED: "#1a3a2a", CLOSED: "#3d1a1a" };
+  const statusConfig = {
+    DRAFT: { color: "#9ca3af", bg: "rgba(156,163,175,0.15)", label: "Draft" },
+    PUBLISHED: { color: "#10b981", bg: "rgba(16,185,129,0.15)", label: "Published" },
+    CLOSED: { color: "#f87171", bg: "rgba(248,113,113,0.15)", label: "Closed" },
+  };
 
   return (
     <div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-        <h2 style={{ color: "white", fontSize: 18, fontWeight: 600, margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
-          <MdOutlineQuiz size={22} /> My Tests
-        </h2>
+      <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-200 flex items-center gap-2">
+            <MdOutlineQuiz size={22} className="text-emerald-400" />
+            My Tests
+          </h2>
+          <p className="text-xs text-gray-400 mt-1">{tests.length} tests created</p>
+        </div>
         <Btn onClick={() => setView("create")}>
           <FiPlus size={14} /> Create test
         </Btn>
       </div>
 
       {loading ? <Spinner /> : tests.length === 0 ? (
-        <Card>
-          <p style={{ color: "white", textAlign: "center", padding: "3rem 0", margin: 0 }}>
-            No tests yet. Create one to get started.
-          </p>
-        </Card>
-      ) : tests.map(t => (
-        <Card key={t.id} style={{ marginBottom: 12 }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: "flex", gap: 8, marginBottom: 6, flexWrap: "wrap", alignItems: "center" }}>
-                <span style={{ color: "white", fontWeight: 600, fontSize: 15 }}>{t.title}</span>
-                <Badge color={statusColor[t.status]} bg={statusBg[t.status]}>{t.status}</Badge>
-              </div>
-              <div style={{ display: "flex", gap: 16, fontSize: 12, color: "white", flexWrap: "wrap" }}>
-                <span style={{ display: "flex", alignItems: "center", gap: 4 }}><FiBook size={12} /> {t.subject}</span>
-                <span style={{ display: "flex", alignItems: "center", gap: 4 }}><MdOutlineSchool size={12} /> {t.form}</span>
-                <span style={{ display: "flex", alignItems: "center", gap: 4 }}><FiClock size={12} /> {t.duration}</span>
-                <span style={{ display: "flex", alignItems: "center", gap: 4 }}><MdOutlineQuestionAnswer size={12} /> {t.questions?.length} questions</span>
-                <span style={{ display: "flex", alignItems: "center", gap: 4 }}><FiAward size={12} /> {t.totalMarks} marks</span>
-                <span style={{ display: "flex", alignItems: "center", gap: 4 }}><FiCalendar size={12} /> {new Date(t.createdAt).toLocaleDateString()}</span>
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <Btn small variant="info" onClick={() => { setSelected(t); setView("submissions"); }}>
-                <FiUsers size={12} /> Submissions
-              </Btn>
-              <Btn small variant="secondary" onClick={() => { setSelected(t); setView("edit"); }}>
-                <FiEdit size={12} /> Edit
-              </Btn>
-            </div>
+        <Card className="text-center py-12">
+          <div className="w-16 h-16 bg-gray-700/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <MdOutlineQuiz size={32} className="text-gray-500" />
           </div>
+          <p className="text-gray-400">No tests yet. Create one to get started</p>
         </Card>
-      ))}
+      ) : (
+        <div className="space-y-3">
+          {tests.map(t => {
+            const config = statusConfig[t.status];
+            return (
+              <Card key={t.id} className="hover:border-gray-600 transition-all">
+                <div className="flex items-start justify-between flex-wrap gap-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 flex-wrap mb-2">
+                      <span className="text-gray-200 font-medium text-base">{t.title}</span>
+                      <Badge color={config.color} bg={config.bg}>{config.label}</Badge>
+                    </div>
+                    <div className="flex flex-wrap gap-3 text-xs text-gray-400">
+                      <span className="flex items-center gap-1"><FiBook size={12} /> {t.subject}</span>
+                      <span className="flex items-center gap-1"><MdOutlineSchool size={12} /> {t.form}</span>
+                      <span className="flex items-center gap-1"><FiClock size={12} /> {t.duration}</span>
+                      <span className="flex items-center gap-1"><MdOutlineQuestionAnswer size={12} /> {t.questions?.length} questions</span>
+                      <span className="flex items-center gap-1"><FiAward size={12} /> {t.totalMarks} marks</span>
+                      <span className="flex items-center gap-1"><FiCalendar size={12} /> {new Date(t.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Btn small variant="info" onClick={() => { setSelected(t); setView("submissions"); }}>
+                      <FiUsers size={12} /> Submissions
+                    </Btn>
+                    <Btn small variant="secondary" onClick={() => { setSelected(t); setView("edit"); }}>
+                      <FiEdit size={12} /> Edit
+                    </Btn>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
-
-// ── STUDENT: Take Test ────────────────────────────────────────────────────────
 
 function TakeTest({ test, onBack }) {
   const [answers, setAnswers] = useState(() =>
     (test.questions ?? []).reduce((acc, q) => ({ ...acc, [q.id]: "" }), {})
   );
   const [submitting, setSubmit] = useState(false);
-  const [error, setError]       = useState("");
-  const [done, setDone]         = useState(false);
+  const [error, setError] = useState("");
+  const [done, setDone] = useState(false);
   const [timeLeft, setTimeLeft] = useState(() => {
     const m = parseInt(test.duration) || 60;
     return m * 60;
@@ -773,12 +748,13 @@ function TakeTest({ test, onBack }) {
   }, [done]);
 
   const formatTime = s => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
-  const timerColor = timeLeft < 300 ? "#f85149" : timeLeft < 600 ? "#e3b341" : "#2ea043";
+  const timerColor = timeLeft < 300 ? "#f87171" : timeLeft < 600 ? "#fbbf24" : "#10b981";
 
   const submit = async () => {
     const blank = test.questions?.filter(q => !answers[q.id]?.trim());
     if (blank?.length > 0) {
-      setError(`Please answer all questions. ${blank.length} unanswered.`); return;
+      setError(`Please answer all questions. ${blank.length} unanswered.`);
+      return;
     }
     setSubmit(true); setError("");
     try {
@@ -795,15 +771,17 @@ function TakeTest({ test, onBack }) {
   };
 
   const answered = Object.values(answers).filter(v => v.trim()).length;
-  const total    = test.questions?.length ?? 0;
+  const total = test.questions?.length ?? 0;
 
   if (done) {
     return (
-      <Card style={{ textAlign: "center", padding: "3rem 2rem" }}>
-        <FiCheckCircle size={48} style={{ color: "#2ea043", marginBottom: 12 }} />
-        <h2 style={{ color: "#2ea043", fontSize: 20, fontWeight: 600, marginBottom: 8 }}>Test submitted!</h2>
-        <p style={{ color: "white", marginBottom: 20 }}>
-          Your answers have been sent to your teacher for marking. You will be notified when results are ready.
+      <Card className="text-center py-12">
+        <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <FiCheckCircle size={40} className="text-emerald-400" />
+        </div>
+        <h2 className="text-xl font-bold text-emerald-400 mb-2">Test submitted!</h2>
+        <p className="text-gray-400 mb-6">
+          Your answers have been sent to your teacher for marking.
         </p>
         <Btn onClick={onBack}>
           <FiArrowLeft size={14} /> Back to tests
@@ -814,26 +792,23 @@ function TakeTest({ test, onBack }) {
 
   return (
     <div>
-      <div style={{
-        position: "sticky", top: 0, zIndex: 10,
-        background: "#0d1117", borderBottom: "1px solid #21262d",
-        padding: "10px 0", marginBottom: 20,
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-      }}>
-        <div>
-          <p style={{ color: "white", fontWeight: 600, margin: 0, fontSize: 15 }}>{test.title}</p>
-          <p style={{ color: "white", fontSize: 12, margin: 0 }}>{test.subject} · {test.form} · {test.totalMarks} marks</p>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ color: timerColor, fontWeight: 700, fontSize: 20, fontVariantNumeric: "tabular-nums" }}>
-              {formatTime(timeLeft)}
-            </div>
-            <div style={{ color: "white", fontSize: 11 }}>remaining</div>
+      <div className="sticky top-0 z-10 bg-gray-900/95 backdrop-blur-sm border-b border-gray-700 pb-3 mb-5">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <p className="text-gray-200 font-semibold">{test.title}</p>
+            <p className="text-xs text-gray-400">{test.subject} · {test.form} · {test.totalMarks} marks</p>
           </div>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ color: "#2ea043", fontWeight: 700, fontSize: 18 }}>{answered}/{total}</div>
-            <div style={{ color: "white", fontSize: 11 }}>answered</div>
+          <div className="flex items-center gap-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold font-mono" style={{ color: timerColor }}>
+                {formatTime(timeLeft)}
+              </div>
+              <div className="text-xs text-gray-400">remaining</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-emerald-400">{answered}/{total}</div>
+              <div className="text-xs text-gray-400">answered</div>
+            </div>
           </div>
         </div>
       </div>
@@ -848,34 +823,35 @@ function TakeTest({ test, onBack }) {
 
       {test.questions?.map((q, i) => {
         const rowHeight = q.type === "long" ? 6 : q.type === "structured" ? 4 : 2;
+        const isAnswered = answers[q.id]?.trim();
         return (
-          <Card key={q.id} style={{ marginBottom: 16 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-              <span style={{ color: "#2ea043", fontWeight: 700, fontSize: 13 }}>Question {i + 1}</span>
+          <Card key={q.id} className="mb-4">
+            <div className="flex justify-between items-start mb-3">
+              <span className="text-emerald-400 font-semibold text-sm">Question {i + 1}</span>
               <Badge>{q.marks} {q.marks === 1 ? "mark" : "marks"}</Badge>
             </div>
-            <p style={{ color: "white", fontSize: 14, marginBottom: 12, lineHeight: 1.6 }}>{q.text}</p>
+            <p className="text-gray-200 text-sm mb-3 leading-relaxed">{q.text}</p>
             <textarea
               value={answers[q.id] || ""}
               onChange={e => setAnswers(a => ({ ...a, [q.id]: e.target.value }))}
               rows={rowHeight}
               placeholder="Write your answer here..."
-              style={{
-                width: "100%", background: "#0d1117", border: answers[q.id]?.trim() ? "1px solid #2ea04380" : "1px solid #30363d",
-                borderRadius: 7, color: "white", padding: "10px 12px", fontSize: 13,
-                resize: "vertical", transition: "border-color 0.15s",
-              }}
+              className={`w-full bg-gray-900/50 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 transition-all resize-vertical ${
+                isAnswered ? "border-emerald-500 focus:ring-emerald-500" : "border-gray-700 focus:border-emerald-500"
+              }`}
             />
-            {answers[q.id]?.trim() && (
-              <p style={{ color: "#2ea04380", fontSize: 11, marginTop: 4, marginBottom: 0 }}>✓ answered</p>
+            {isAnswered && (
+              <p className="text-emerald-400/70 text-xs mt-1 flex items-center gap-1">
+                <FiCheck size={10} /> answered
+              </p>
             )}
           </Card>
         );
       })}
 
-      <div style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 8, paddingBottom: 32 }}>
+      <div className="flex gap-3 items-center mt-4 pb-8">
         <Btn onClick={submit} disabled={submitting}>
-          {submitting ? <FiLoader size={14} /> : <FiSend size={14} />}
+          {submitting ? <FiLoader size={14} className="animate-spin" /> : <FiSend size={14} />}
           {submitting ? " Submitting..." : ` Submit test (${answered}/${total} answered)`}
         </Btn>
         <Btn variant="ghost" onClick={onBack}>Cancel</Btn>
@@ -884,12 +860,10 @@ function TakeTest({ test, onBack }) {
   );
 }
 
-// ── STUDENT: View Result ──────────────────────────────────────────────────────
-
 function ViewResult({ test, studentId, onBack }) {
-  const [result, setResult]   = useState(null);
+  const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const load = async () => {
@@ -905,61 +879,58 @@ function ViewResult({ test, studentId, onBack }) {
   }, []);
 
   if (loading) return <Spinner />;
-  if (error)   return <><Alert type="error">{error}</Alert><Btn onClick={onBack} variant="ghost"><FiArrowLeft size={14} /> Back</Btn></>;
+  if (error) return <><Alert type="error">{error}</Alert><Btn variant="ghost" onClick={onBack}><FiArrowLeft size={14} /> Back</Btn></>;
 
   const isMarked = result.status === "MARKED";
 
   return (
     <div>
-      <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 20 }}>
+      <div className="flex items-center gap-3 mb-5">
         <Btn variant="ghost" onClick={onBack}>
           <FiArrowLeft size={14} /> Back
         </Btn>
-        <h2 style={{ color: "white", fontSize: 17, fontWeight: 600, margin: 0 }}>{test.title} — My Result</h2>
+        <h2 className="text-xl font-semibold text-gray-200">{test.title} — My Result</h2>
       </div>
 
       {isMarked ? (
         <>
-          <Card style={{ textAlign: "center", marginBottom: 20, padding: "2rem" }}>
-            <div style={{ fontSize: 40, marginBottom: 8 }}>
-              {result.percentage >= 75 ? <FiAward size={40} style={{ color: "#2ea043" }} /> : 
-               result.percentage >= 50 ? <FiTrendingUp size={40} style={{ color: "#e3b341" }} /> : 
-               <FiBarChart2 size={40} style={{ color: "#f85149" }} />}
+          <Card className="text-center mb-5 py-8">
+            <div className="mb-3">
+              {result.percentage >= 75 ? <FiStar size={48} className="text-emerald-400 mx-auto" /> : 
+               result.percentage >= 50 ? <FiTrendingUp size={48} className="text-amber-400 mx-auto" /> : 
+               <FiBarChart2 size={48} className="text-red-400 mx-auto" />}
             </div>
-            <div style={{ color: "#2ea043", fontWeight: 700, fontSize: 32 }}>{result.percentage}%</div>
-            <div style={{ color: "white", fontSize: 14 }}>{result.totalScore} / {test.totalMarks} marks</div>
+            <div className="text-4xl font-bold text-emerald-400 mb-1">{result.percentage}%</div>
+            <div className="text-gray-400">{result.totalScore} / {test.totalMarks} marks</div>
             {result.teacherComment && (
-              <div style={{ marginTop: 16, background: "#1a3a2a", borderRadius: 8, padding: "12px 16px", textAlign: "left", border: "1px solid #2ea04340" }}>
-                <p style={{ color: "white", fontSize: 11, margin: "0 0 4px", textTransform: "uppercase" }}>Teacher comment</p>
-                <p style={{ color: "#3fb950", fontSize: 13, margin: 0 }}>{result.teacherComment}</p>
+              <div className="mt-4 p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/30 text-left">
+                <p className="text-emerald-400 text-xs uppercase tracking-wide mb-1">Teacher comment</p>
+                <p className="text-gray-200 text-sm">{result.teacherComment}</p>
               </div>
             )}
           </Card>
 
           {test.questions?.map((q, i) => {
-            const answer    = result.answers?.find(a => a.questionId === q.id)?.answer ?? "(no answer)";
-            const marked    = result.finalMarks?.find(m => m.questionId === q.id);
+            const answer = result.answers?.find(a => a.questionId === q.id)?.answer ?? "(no answer)";
+            const marked = result.finalMarks?.find(m => m.questionId === q.id);
             return (
-              <Card key={q.id} style={{ marginBottom: 12 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <span style={{ color: "white", fontWeight: 600, fontSize: 14 }}>Q{i + 1}. {q.text}</span>
+              <Card key={q.id} className="mb-3">
+                <div className="flex justify-between items-start mb-3">
+                  <span className="text-gray-200 font-medium">Q{i+1}. {q.text}</span>
                   {marked && (
-                    <Badge
-                      color={marked.mark >= q.marks * 0.7 ? "#3fb950" : marked.mark >= q.marks * 0.4 ? "#e3b341" : "#f85149"}
-                      bg="#0d1117"
-                    >
+                    <Badge color={marked.mark >= q.marks * 0.7 ? "#10b981" : marked.mark >= q.marks * 0.4 ? "#fbbf24" : "#f87171"}>
                       {marked.mark} / {q.marks}
                     </Badge>
                   )}
                 </div>
-                <div style={{ background: "#0d1117", borderRadius: 6, padding: "8px 12px", marginBottom: 8, border: "1px solid #21262d" }}>
-                  <p style={{ color: "white", fontSize: 11, margin: "0 0 3px" }}>Your answer</p>
-                  <p style={{ color: "white", fontSize: 13, margin: 0, whiteSpace: "pre-wrap" }}>{answer}</p>
+                <div className="bg-gray-900/50 rounded-lg p-3 mb-3 border border-gray-700">
+                  <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">Your answer</p>
+                  <p className="text-gray-200 text-sm whitespace-pre-wrap">{answer}</p>
                 </div>
                 {marked?.feedback && (
-                  <div style={{ background: "#0d2a3d", borderRadius: 6, padding: "8px 12px", border: "1px solid #1f6feb40" }}>
-                    <p style={{ color: "#58a6ff", fontSize: 11, margin: "0 0 3px" }}>Teacher feedback</p>
-                    <p style={{ color: "white", fontSize: 13, margin: 0 }}>{marked.feedback}</p>
+                  <div className="bg-blue-500/10 rounded-lg p-3 border border-blue-500/30">
+                    <p className="text-blue-400 text-xs uppercase tracking-wide mb-1">Teacher feedback</p>
+                    <p className="text-gray-200 text-sm">{marked.feedback}</p>
                   </div>
                 )}
               </Card>
@@ -967,22 +938,22 @@ function ViewResult({ test, studentId, onBack }) {
           })}
         </>
       ) : (
-        <Card style={{ textAlign: "center", padding: "3rem" }}>
-          <FiClock size={48} style={{ color: "#e3b341", marginBottom: 12 }} />
-          <p style={{ color: "white", fontWeight: 600, marginBottom: 6 }}>Test submitted — awaiting marking</p>
-          <p style={{ color: "white", fontSize: 13 }}>Your teacher will mark your test and you'll see your results here.</p>
+        <Card className="text-center py-12">
+          <div className="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FiClock size={40} className="text-amber-400" />
+          </div>
+          <p className="text-gray-200 font-medium mb-1">Test submitted — awaiting marking</p>
+          <p className="text-gray-400 text-sm">Your teacher will mark your test and results will appear here</p>
         </Card>
       )}
     </div>
   );
 }
 
-// ── STUDENT: Tests List ───────────────────────────────────────────────────────
-
 function StudentTestsView() {
-  const [tests, setTests]     = useState([]);
+  const [tests, setTests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [view, setView]       = useState("list");
+  const [view, setView] = useState("list");
   const [selected, setSelected] = useState(null);
   const user = userFromStorage();
 
@@ -997,69 +968,71 @@ function StudentTestsView() {
     load();
   }, []);
 
-  if (view === "take"   && selected) return <TakeTest test={selected} onBack={() => { setView("list"); setSelected(null); }} />;
+  if (view === "take" && selected) return <TakeTest test={selected} onBack={() => { setView("list"); setSelected(null); }} />;
   if (view === "result" && selected) return <ViewResult test={selected} studentId={user.id} onBack={() => { setView("list"); setSelected(null); }} />;
 
   return (
     <div>
-      <h2 style={{ color: "white", fontSize: 18, fontWeight: 600, marginBottom: 20, display: "flex", alignItems: "center", gap: 8 }}>
-        <MdOutlineQuiz size={22} /> Available Tests
+      <h2 className="text-xl font-semibold text-gray-200 mb-5 flex items-center gap-2">
+        <MdOutlineQuiz size={22} className="text-emerald-400" />
+        Available Tests
       </h2>
       {loading ? <Spinner /> : tests.length === 0 ? (
-        <Card><p style={{ color: "white", textAlign: "center", padding: "3rem 0", margin: 0 }}>No tests available yet.</p></Card>
-      ) : tests.map(t => (
-        <Card key={t.id} style={{ marginBottom: 12 }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-            <div>
-              <p style={{ color: "white", fontWeight: 600, fontSize: 15, margin: "0 0 6px" }}>{t.title}</p>
-              <div style={{ display: "flex", gap: 12, fontSize: 12, color: "white", flexWrap: "wrap" }}>
-                <span style={{ display: "flex", alignItems: "center", gap: 4 }}><FiBook size={12} /> {t.subject}</span>
-                <span style={{ display: "flex", alignItems: "center", gap: 4 }}><MdOutlineSchool size={12} /> {t.form}</span>
-                <span style={{ display: "flex", alignItems: "center", gap: 4 }}><FiClock size={12} /> {t.duration}</span>
-                <span style={{ display: "flex", alignItems: "center", gap: 4 }}><FiAward size={12} /> {t.totalMarks} marks</span>
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: 8 }}>
-              <Btn small variant="info" onClick={() => { setSelected(t); setView("result"); }}>
-                <FiEye size={12} /> View result
-              </Btn>
-              <Btn small onClick={() => { setSelected(t); setView("take"); }}>
-                <FiEdit size={12} /> Take test
-              </Btn>
-            </div>
+        <Card className="text-center py-12">
+          <div className="w-16 h-16 bg-gray-700/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <MdOutlineQuiz size={32} className="text-gray-500" />
           </div>
+          <p className="text-gray-400">No tests available yet</p>
         </Card>
-      ))}
+      ) : (
+        <div className="space-y-3">
+          {tests.map(t => (
+            <Card key={t.id} className="hover:border-gray-600 transition-all">
+              <div className="flex items-start justify-between flex-wrap gap-3">
+                <div className="flex-1">
+                  <p className="text-gray-200 font-medium text-base mb-1">{t.title}</p>
+                  <div className="flex flex-wrap gap-3 text-xs text-gray-400">
+                    <span className="flex items-center gap-1"><FiBook size={12} /> {t.subject}</span>
+                    <span className="flex items-center gap-1"><MdOutlineSchool size={12} /> {t.form}</span>
+                    <span className="flex items-center gap-1"><FiClock size={12} /> {t.duration}</span>
+                    <span className="flex items-center gap-1"><FiAward size={12} /> {t.totalMarks} marks</span>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Btn small variant="info" onClick={() => { setSelected(t); setView("result"); }}>
+                    <FiEye size={12} /> View result
+                  </Btn>
+                  <Btn small onClick={() => { setSelected(t); setView("take"); }}>
+                    <FiEdit size={12} /> Take test
+                  </Btn>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
-
-// ── Shared style helpers ──────────────────────────────────────────────────────
-
-const lbl = { fontSize: 11, color: "white", display: "block", marginBottom: 4 };
-const inp = {
-  background: "#0d1117", border: "1px solid #30363d", borderRadius: 6,
-  color: "white", padding: "7px 10px", fontSize: 13, width: "100%",
-};
-const sel = { ...inp };
-
-// ── Main Page ─────────────────────────────────────────────────────────────────
 
 const StructuredTests = () => {
   const user = userFromStorage();
   const isTeacher = user?.role === "TEACHER" || user?.role === "ADMIN";
 
   return (
-    <div style={{ background: "#0d1117", minHeight: "100vh", color: "white" }}>
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "2rem 1rem" }}>
-        <div style={{ marginBottom: 24 }}>
-          <h1 style={{ color: "#2ea043", fontSize: 22, fontWeight: 600, margin: "0 0 4px", display: "flex", alignItems: "center", gap: 8 }}>
-            <MdOutlineQuiz size={24} /> Structured Tests
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-emerald-400 flex items-center gap-2 mb-1">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+              <MdOutlineQuiz size={18} className="text-white" />
+            </div>
+            Structured Tests
           </h1>
-          <p style={{ color: "white", fontSize: 13, margin: 0 }}>
+          <p className="text-gray-400 text-sm">
             {isTeacher
-              ? "Create AI-generated written tests, review student submissions, and mark with AI assistance."
-              : "Take written tests set by your teacher and view your marked results."}
+              ? "Create AI-generated written tests, review submissions, and mark with AI assistance"
+              : "Take written tests set by your teacher and view your marked results"}
           </p>
         </div>
         {isTeacher ? <TeacherTestsView /> : <StudentTestsView />}
