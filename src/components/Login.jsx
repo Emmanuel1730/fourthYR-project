@@ -78,20 +78,20 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => { setRole("student"); setError(""); }}
-                className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
                   role === "student" 
                     ? "bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg shadow-emerald-500/25" 
-                    : "text-gray-400 hover:text-gray-200"
+                    : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
                 }`}>
                 Student
               </button>
               <button
                 type="button"
                 onClick={() => { setRole("teacher"); setError(""); }}
-                className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
                   role === "teacher" 
                     ? "bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg shadow-emerald-500/25" 
-                    : "text-gray-400 hover:text-gray-200"
+                    : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
                 }`}>
                 Teacher
               </button>
@@ -99,18 +99,18 @@ const Login = () => {
 
             {/* Error Message */}
             {error && (
-              <div className="mb-4 px-3 py-2 rounded-xl text-sm flex items-center gap-2 bg-red-500/20 border border-red-500/50 text-red-400">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="mb-4 px-4 py-3 rounded-xl text-sm flex items-center gap-2 bg-red-500/10 border border-red-500/50 text-red-400">
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                {error}
+                <span>{error}</span>
               </div>
             )}
 
             {/* Login Form */}
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="block text-xs text-gray-400 mb-1">Email Address</label>
+                <label className="block text-xs text-gray-400 mb-1.5 font-medium">Email Address</label>
                 <input
                   type="email"
                   placeholder="you@example.com"
@@ -118,11 +118,11 @@ const Login = () => {
                   onChange={(e) => { setEmail(e.target.value); setError(""); }}
                   required
                   disabled={loading}
-                  className="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-200 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all disabled:opacity-50"
+                  className="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-200 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed placeholder-gray-500"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-400 mb-1">Password</label>
+                <label className="block text-xs text-gray-400 mb-1.5 font-medium">Password</label>
                 <input
                   type="password"
                   placeholder="••••••••"
@@ -130,13 +130,13 @@ const Login = () => {
                   onChange={(e) => { setPassword(e.target.value); setError(""); }}
                   required
                   disabled={loading}
-                  className="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-200 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all disabled:opacity-50"
+                  className="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-200 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed placeholder-gray-500"
                 />
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 text-white py-2.5 rounded-xl text-sm font-medium hover:from-emerald-500 hover:to-emerald-600 transition-all disabled:opacity-50 shadow-lg shadow-emerald-500/25">
+                className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 text-white py-2.5 rounded-xl text-sm font-medium hover:from-emerald-500 hover:to-emerald-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/25 mt-2">
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
                     <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,18 +151,21 @@ const Login = () => {
             </form>
 
             {/* Signup Link */}
-            <p className="text-sm text-gray-400 mt-5 text-center">
-              <Link to="/school/register" className="text-emerald-400 hover:text-emerald-300 font-medium transition-colors">
-                Register a School 
-              </Link>
-            </p>
+            <div className="mt-6 pt-4 border-t border-gray-700">
+              <p className="text-sm text-center text-gray-400">
+                Don't have a school account?{' '}
+                <Link to="/school/register" className="text-emerald-400 hover:text-emerald-300 font-medium transition-colors">
+                  Register a School
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Footer */}
       <footer className="text-center py-6 text-gray-500 text-sm border-t border-gray-800">
-        © 2026 Malawi Edulib System
+        <p>© 2026 Malawi Edulib System. All rights reserved.</p>
       </footer>
     </div>
   );

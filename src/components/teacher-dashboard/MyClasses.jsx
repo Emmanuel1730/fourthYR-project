@@ -10,16 +10,16 @@ import { BiBookOpen } from "react-icons/bi";
 const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 const TYPE_STYLE = {
-  "Lesson Plan":  { bg: "from-amber-500/20 to-amber-600/20", color: "#fbbf24", icon: "📋" },
-  "Worksheet":    { bg: "from-emerald-500/20 to-teal-500/20", color: "#10b981", icon: "📝" },
-  "Presentation": { bg: "from-purple-500/20 to-pink-500/20", color: "#a78bfa", icon: "🎯" },
-  "Book":         { bg: "from-blue-500/20 to-cyan-500/20", color: "#60a5fa", icon: "📚" },
-  "Quiz":         { bg: "from-red-500/20 to-orange-500/20", color: "#f87171", icon: "❓" },
-  "PDF":          { bg: "from-blue-500/20 to-cyan-500/20", color: "#60a5fa", icon: "📄" },
-  "VIDEO":        { bg: "from-orange-500/20 to-red-500/20", color: "#fb923c", icon: "🎬" },
+  "Lesson Plan":  { bg: "from-amber-500/20 to-amber-600/20", color: "#fbbf24", icon: <FiBook size={12} /> },
+  "Worksheet":    { bg: "from-emerald-500/20 to-teal-500/20", color: "#10b981", icon: <FiFolder size={12} /> },
+  "Presentation": { bg: "from-purple-500/20 to-pink-500/20", color: "#a78bfa", icon: <FiGrid size={12} /> },
+  "Book":         { bg: "from-blue-500/20 to-cyan-500/20", color: "#60a5fa", icon: <MdOutlineLibraryBooks size={12} /> },
+  "Quiz":         { bg: "from-red-500/20 to-orange-500/20", color: "#f87171", icon: <FiCheck size={12} /> },
+  "PDF":          { bg: "from-blue-500/20 to-cyan-500/20", color: "#60a5fa", icon: <FiBook size={12} /> },
+  "VIDEO":        { bg: "from-orange-500/20 to-red-500/20", color: "#fb923c", icon: <FiFolder size={12} /> },
 };
 
-const getTypeStyle = (type) => TYPE_STYLE[type] ?? { bg: "from-gray-500/20 to-gray-600/20", color: "#9ca3af", icon: "📁" };
+const getTypeStyle = (type) => TYPE_STYLE[type] ?? { bg: "from-gray-500/20 to-gray-600/20", color: "#9ca3af", icon: <FiFolder size={12} /> };
 
 export default function MyClasses() {
   const [classes, setClasses]       = useState([]);
@@ -48,14 +48,22 @@ export default function MyClasses() {
           fetch(`${API_BASE}/classes`, { headers }),
           fetch(`${API_BASE}/resources`, { headers }),
         ]);
-        if (clsRes.ok)  setClasses(await clsRes.json());
+        if (clsRes.ok) {
+          const clsData = await clsRes.json();
+          // Handle both array and paginated responses
+          const classesArray = Array.isArray(clsData?.data) ? clsData.data : Array.isArray(clsData) ? clsData : [];
+          setClasses(classesArray);
+        }
         if (resRes.ok) {
           const data = await resRes.json();
           const arr = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : [];
           setAll(arr);
         }
-      } catch {}
-      finally { setLoading(false); }
+      } catch (err) {
+        console.error("Error loading data:", err);
+      } finally {
+        setLoading(false);
+      }
     };
     load();
   }, []);
@@ -67,9 +75,13 @@ export default function MyClasses() {
         const res = await fetch(`${API_BASE}/classes/${selected.id}/resources`, { headers });
         if (res.ok) {
           const data = await res.json();
-          setClassRes(data.map((cr) => cr.resource));
+          // Extract resources from the response
+          const resourcesArray = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : [];
+          setClassRes(resourcesArray.map((cr) => cr.resource || cr));
         }
-      } catch {}
+      } catch (err) {
+        console.error("Error loading class resources:", err);
+      }
     };
     load();
   }, [selected]);
@@ -85,7 +97,7 @@ export default function MyClasses() {
         throw new Error(data?.message ?? "Failed to assign resource");
       }
       setClassRes((prev) => [...prev, resource]);
-      showToast(`✨ "${resource.title}" assigned to ${selected.name}`);
+      showToast(`"${resource.title}" assigned to ${selected.name}`);
       setShowAssign(false);
     } catch (err) {
       showToast(err.message, "error");
@@ -106,19 +118,22 @@ export default function MyClasses() {
     }
   };
 
+  // Calculate total students across all classes
+  const totalStudents = classes.reduce((sum, cls) => sum + (cls.students?.length || cls.studentCount || 0), 0);
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-white dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-          <p className="text-gray-400">Loading classes...</p>
+          <p className="text-gray-700 dark:text-gray-400">Loading classes...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 text-gray-200 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-white text-gray-900 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 dark:text-gray-200 p-6">
       <style>{`
         @keyframes slideIn {
           from { opacity: 0; transform: translateX(100px); }
@@ -126,6 +141,20 @@ export default function MyClasses() {
         }
         .toast-animation {
           animation: slideIn 0.3s ease-out;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #1f2937;
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #4b5563;
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #6b7280;
         }
       `}</style>
 
@@ -136,7 +165,8 @@ export default function MyClasses() {
               ? "bg-red-500/20 border border-red-500/50 text-red-400" 
               : "bg-emerald-500/20 border border-emerald-500/50 text-emerald-400"
           }`}>
-            {toast.type === "error" ? <IoWarningOutline /> : <FiCheck />} {toast.msg}
+            {toast.type === "error" ? <IoWarningOutline size={16} /> : <FiCheck size={16} />} 
+            {toast.msg}
           </div>
         </div>
       )}
@@ -153,23 +183,23 @@ export default function MyClasses() {
               </div>
               My Classes
             </h1>
-            <p className="text-gray-400 text-sm">Manage your classes and assign learning resources to students</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">Manage your classes and assign learning resources to students</p>
           </div>
         </section>
 
         {/* Stats Cards */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {[
-            { number: classes.length, label: "Total Classes", icon: <MdOutlineClass />, gradient: "from-blue-500 to-cyan-500" },
-            { number: classes.reduce((s, c) => s + (c.students ?? 0), 0), label: "Students", icon: <FaUserGraduate />, gradient: "from-emerald-500 to-teal-500" },
-            { number: allResources.length, label: "Resources", icon: <MdOutlineLibraryBooks />, gradient: "from-purple-500 to-pink-500" },
-            { number: classes.length, label: "Active Classes", icon: <FiGrid />, gradient: "from-orange-500 to-amber-500" },
+            { number: classes.length, label: "Total Classes", icon: <MdOutlineClass size={20} />, gradient: "from-blue-500 to-cyan-500" },
+            { number: totalStudents, label: "Students", icon: <FaUserGraduate size={20} />, gradient: "from-emerald-500 to-teal-500" },
+            { number: allResources.length, label: "Resources", icon: <MdOutlineLibraryBooks size={20} />, gradient: "from-purple-500 to-pink-500" },
+            { number: classes.filter(c => c.active !== false).length, label: "Active Classes", icon: <FiGrid size={20} />, gradient: "from-orange-500 to-amber-500" },
           ].map((stat, i) => (
-            <div key={i} className="relative overflow-hidden bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-5 hover:border-gray-600 transition-all duration-300">
+            <div key={i} className="relative overflow-hidden bg-white/90 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-300">
               <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${stat.gradient} opacity-10 rounded-full -mr-8 -mt-8`}></div>
-              <div className="text-gray-400 mb-2">{stat.icon}</div>
+              <div className="text-gray-600 dark:text-gray-300 mb-2">{stat.icon}</div>
               <div className={`text-3xl font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent`}>{stat.number}</div>
-              <div className="text-xs text-gray-400 mt-1">{stat.label}</div>
+              <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">{stat.label}</div>
             </div>
           ))}
         </section>
@@ -185,9 +215,9 @@ export default function MyClasses() {
               Your Classes
             </h2>
             {classes.length === 0 ? (
-              <div className="text-center py-12 bg-gray-800/30 rounded-xl">
-                <BiBookOpen className="mx-auto mb-3 text-gray-600" size={48} />
-                <p className="text-gray-400 text-sm">No classes found</p>
+              <div className="text-center py-12 bg-gray-50/90 dark:bg-gray-800/30 rounded-xl border border-gray-200 dark:border-gray-700">
+                <BiBookOpen className="mx-auto mb-3 text-gray-500 dark:text-gray-400" size={48} />
+                <p className="text-gray-600 dark:text-gray-400 text-sm">No classes found</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -196,7 +226,7 @@ export default function MyClasses() {
                     className={`w-full text-left rounded-xl p-4 transition-all duration-300 ${
                       selected?.id === cls.id 
                         ? "bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border-emerald-500/50 shadow-lg shadow-emerald-500/10" 
-                        : "bg-gray-800/30 border-gray-700 hover:border-gray-600"
+                        : "bg-gray-50/90 dark:bg-gray-800/30 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
                     } border`}>
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-semibold flex items-center gap-2">
@@ -205,8 +235,13 @@ export default function MyClasses() {
                       </span>
                     </div>
                     {cls.school?.name && (
-                      <div className="text-xs text-gray-400 flex items-center gap-1">
+                      <div className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
                         <MdOutlineSchool size={12} /> {cls.school.name}
+                      </div>
+                    )}
+                    {cls.students && (
+                      <div className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mt-1">
+                        <FaUserGraduate size={10} /> {cls.students.length} students
                       </div>
                     )}
                   </button>
@@ -218,21 +253,21 @@ export default function MyClasses() {
           {/* Resource Panel */}
           <div>
             {!selected ? (
-              <div className="bg-gray-800/30 border border-gray-700 rounded-xl p-12 text-center h-full flex flex-col items-center justify-center">
-                <div className="w-16 h-16 bg-gray-700/30 rounded-full flex items-center justify-center mb-4">
-                  <FiArrowLeft size={32} className="text-gray-500" />
+              <div className="bg-gray-50/90 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700 rounded-xl p-12 text-center h-full flex flex-col items-center justify-center">
+                <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700/30 rounded-full flex items-center justify-center mb-4">
+                  <FiArrowLeft size={32} className="text-gray-500 dark:text-gray-300" />
                 </div>
-                <p className="text-gray-400 text-sm">Select a class to manage its resources</p>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">Select a class to manage its resources</p>
               </div>
             ) : (
-              <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl overflow-hidden">
-                <div className="bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border-b border-gray-700 px-5 py-4 flex items-center justify-between">
+              <div className="bg-white/90 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+                <div className="bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border-b border-gray-200 dark:border-gray-700 px-5 py-4 flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold flex items-center gap-2 text-gray-200">
-                      <MdOutlineClass /> {selected.name}
+                    <h3 className="font-semibold flex items-center gap-2 text-gray-900 dark:text-gray-100">
+                      <MdOutlineClass size={16} /> {selected.name}
                     </h3>
                     {selected.school?.name && (
-                      <p className="text-xs text-gray-400 flex items-center gap-1 mt-1">
+                      <p className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1 mt-1">
                         <MdOutlineSchool size={12} /> {selected.school.name}
                       </p>
                     )}
@@ -244,10 +279,10 @@ export default function MyClasses() {
                 </div>
 
                 {showAssign && (
-                  <div className="border-b border-gray-700 bg-gray-900/50 px-5 py-4">
-                    <p className="text-xs text-gray-400 mb-3">Choose a resource to assign:</p>
+                  <div className="border-b border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-900/50 px-5 py-4">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">Choose a resource to assign:</p>
                     {allResources.length === 0 ? (
-                      <p className="text-xs text-gray-400">No resources available</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">No resources available</p>
                     ) : (
                       <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
                         {allResources.map((res) => {
@@ -257,15 +292,16 @@ export default function MyClasses() {
                             <button key={res.id} onClick={() => assignResource(res)} disabled={assigned}
                               className={`w-full text-left flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${
                                 assigned 
-                                  ? "border-gray-700 bg-gray-800/30 opacity-50 cursor-not-allowed" 
-                                  : "border-gray-700 bg-gray-800/50 hover:border-emerald-500/50 hover:bg-gray-800"
+                                  ? "border-gray-200 dark:border-gray-700 bg-gray-50/90 dark:bg-gray-800/30 opacity-50 cursor-not-allowed" 
+                                  : "border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-800/50 hover:border-emerald-500/50 dark:hover:border-emerald-500/50"
                               }`}>
-                              <span className="text-sm text-gray-200 truncate flex items-center gap-2">
-                                <span>{style.icon}</span> {res.title}
+                              <span className="text-sm text-gray-900 dark:text-gray-200 truncate flex items-center gap-2">
+                                <span className="text-gray-600 dark:text-gray-400">{style.icon}</span> 
+                                {res.title}
                               </span>
-                              <span className={`text-xs font-medium px-2 py-0.5 rounded-full bg-gradient-to-r ${style.bg} text-${style.color}`}
+                              <span className={`text-xs font-medium px-2 py-0.5 rounded-full bg-gradient-to-r ${style.bg}`}
                                 style={{ color: style.color }}>
-                                {assigned ? "✓ Added" : res.type}
+                                {assigned ? "Added" : res.type}
                               </span>
                             </button>
                           );
@@ -276,15 +312,15 @@ export default function MyClasses() {
                 )}
 
                 <div className="p-5">
-                  <p className="text-xs text-gray-400 mb-3 flex items-center gap-1">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 flex items-center gap-1">
                     <MdAssignment size={12} /> Assigned Resources ({classResources.length})
                   </p>
                   {classResources.length === 0 ? (
-                    <div className="text-center py-8">
-                      <div className="text-3xl mb-2 flex justify-center">
-                        <MdOutlineLibraryBooks size={40} className="text-gray-600" />
+                    <div className="text-center py-8 bg-white/30 dark:bg-gray-900/30 rounded-xl border border-gray-200 dark:border-gray-700">
+                      <div className="mb-2 flex justify-center">
+                        <MdOutlineLibraryBooks size={40} className="text-gray-500 dark:text-gray-400" />
                       </div>
-                      <p className="text-xs text-gray-400">No resources assigned yet</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">No resources assigned yet</p>
                     </div>
                   ) : (
                     <div className="space-y-2">
@@ -292,13 +328,13 @@ export default function MyClasses() {
                         const style = getTypeStyle(res.type);
                         return (
                           <div key={res.id}
-                            className="flex items-center justify-between bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-3 hover:border-emerald-500/50 transition-all group">
+                            className="flex items-center justify-between bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 hover:border-emerald-500/50 dark:hover:border-emerald-500/50 transition-all group">
                             <div className="flex items-center gap-3 flex-1 min-w-0">
-                              <span className="text-sm font-medium px-2 py-0.5 rounded-full bg-gradient-to-r flex items-center gap-1" 
+                              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gradient-to-r flex items-center gap-1" 
                                 style={{ background: style.bg, color: style.color }}>
                                 <span>{style.icon}</span> {res.type}
                               </span>
-                              <span className="text-sm truncate flex items-center gap-2 text-gray-300">
+                              <span className="text-sm truncate flex items-center gap-2 text-gray-900 dark:text-gray-200">
                                 <FiBook size={12} className="flex-shrink-0" /> {res.title}
                               </span>
                             </div>
@@ -317,23 +353,6 @@ export default function MyClasses() {
           </div>
         </div>
       </main>
-
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #1f2937;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #4b5563;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #6b7280;
-        }
-      `}</style>
     </div>
   );
 }

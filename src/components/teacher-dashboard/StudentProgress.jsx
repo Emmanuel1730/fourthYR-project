@@ -1,4 +1,3 @@
-// StudentProgress.jsx
 import React, { useState } from "react";
 import { FiSearch, FiUsers, FiTrendingUp, FiAward, FiAlertCircle, FiBook, FiCheckCircle } from "react-icons/fi";
 import { MdOutlineQuiz, MdOutlineSchool, MdOutlineClass } from "react-icons/md";
@@ -125,7 +124,7 @@ export default function StudentProgress() {
   const needsHelp = filtered.filter((s) => studentAvg(s) < 60);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 text-gray-200 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-white dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-200 p-6">
       <main className="max-w-6xl mx-auto p-4">
 
         {/* Hero Section */}
@@ -150,11 +149,11 @@ export default function StudentProgress() {
             { number: topStudent?.name?.split(" ")[0] || "—", label: "Top Performer", icon: <FiAward size={24} />, gradient: "from-amber-500 to-orange-500" },
             { number: needsHelp.length, label: "Need Attention", icon: <FiAlertCircle size={24} />, gradient: "from-red-500 to-pink-500" },
           ].map((stat, i) => (
-            <div key={i} className="relative overflow-hidden bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-5 hover:border-gray-600 hover:-translate-y-1 transition-all duration-300">
+            <div key={i} className="relative overflow-hidden bg-white/90 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-300">
               <div className={`absolute top-0 right-0 w-28 h-28 bg-gradient-to-br ${stat.gradient} opacity-10 rounded-full -mr-8 -mt-8`}></div>
               <div className="text-gray-300 mb-2">{stat.icon}</div>
               <div className={`text-3xl font-extrabold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent truncate`}>{stat.number}</div>
-              <div className="text-sm font-semibold text-gray-400 mt-1">{stat.label}</div>
+              <div className="text-sm font-semibold text-gray-600 dark:text-gray-400 mt-1">{stat.label}</div>
             </div>
           ))}
         </section>
@@ -162,16 +161,16 @@ export default function StudentProgress() {
         {/* Filters */}
         <section className="flex flex-wrap gap-3 mb-6 items-center">
           <div className="relative flex-1 min-w-[200px]">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={16} />
             <input type="text" placeholder="Search students..." value={searchVal} onChange={(e) => setSearchVal(e.target.value)}
-              className="w-full pl-10 bg-gray-800/50 border border-gray-700 text-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 placeholder-gray-500 transition-all font-medium" />
+              className="w-full pl-10 bg-white/90 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 placeholder-gray-500 transition-all font-medium" />
           </div>
           <select value={filterForm} onChange={(e) => setFilterForm(e.target.value)}
-            className="bg-gray-800/50 border border-gray-700 text-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-emerald-500 transition-all font-medium">
+            className="bg-white/50 dark:bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-emerald-500 transition-all font-medium">
             {FORMS.map((f) => <option key={f}>{f}</option>)}
           </select>
           <select value={filterClass} onChange={(e) => setFilterClass(e.target.value)}
-            className="bg-gray-800/50 border border-gray-700 text-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-emerald-500 transition-all font-medium">
+            className="bg-white/50 dark:bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-emerald-500 transition-all font-medium">
             {CLASSES.map((c) => <option key={c}>{c}</option>)}
           </select>
           <span className="text-gray-300 text-base font-semibold ml-auto">{filtered.length} student{filtered.length !== 1 ? "s" : ""}</span>
@@ -190,8 +189,8 @@ export default function StudentProgress() {
             </h2>
 
             {filtered.length === 0 ? (
-              <div className="bg-gray-800/30 border border-gray-700 rounded-xl p-10 text-center">
-                <p className="text-gray-400 text-base font-medium">No students match filters</p>
+              <div className="bg-gray-50/90 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700 rounded-xl p-10 text-center">
+                <p className="text-gray-600 dark:text-gray-400 text-base font-medium">No students match filters</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -204,7 +203,7 @@ export default function StudentProgress() {
                       className={`w-full text-left rounded-xl p-4 border transition-all duration-300 ${
                         isSel 
                           ? "bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border-emerald-500/50 shadow-lg shadow-emerald-500/10" 
-                          : "bg-gray-800/30 border-gray-700 hover:border-gray-600"
+                          : "bg-gray-50/90 dark:bg-gray-800/30 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
                       }`}>
                       <div className="flex items-center gap-3">
                         <div className={`w-12 h-12 rounded-full flex items-center justify-center text-base font-bold bg-gradient-to-r ${sc.bg}`}
@@ -213,11 +212,11 @@ export default function StudentProgress() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-base font-semibold text-gray-200 truncate">{s.name}</span>
+                            <span className="text-base font-semibold text-gray-900 dark:text-gray-200 truncate">{s.name}</span>
                             <span className="text-sm font-bold ml-2" style={{ color: sc.color }}>{pct}%</span>
                           </div>
                           <ProgressBar pct={pct} />
-                          <div className="text-sm text-gray-400 mt-1 font-medium">{s.form} · Class {s.class}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400 mt-1 font-medium">{s.form} · Class {s.class}</div>
                         </div>
                       </div>
                     </button>
@@ -230,31 +229,31 @@ export default function StudentProgress() {
           {/* Detail Panel */}
           <div className="md:col-span-3">
             {!selected ? (
-              <div className="bg-gray-800/30 border border-gray-700 rounded-xl p-12 text-center h-full flex flex-col items-center justify-center">
-                <div className="w-20 h-20 bg-gray-700/30 rounded-full flex items-center justify-center mb-4">
+              <div className="bg-white/30 dark:bg-gray-50/30 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700 rounded-xl p-12 text-center h-full flex flex-col items-center justify-center">
+                <div className="w-20 h-20 bg-gray-100/70 dark:bg-gray-50/30 dark:bg-gray-700/30 rounded-full flex items-center justify-center mb-4">
                   <FiUsers size={40} className="text-gray-500" />
                 </div>
                 <p className="text-gray-400 text-base font-medium">Select a student to view their progress</p>
               </div>
             ) : (
-              <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl overflow-hidden">
+              <div className="bg-white/90 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
                 {(() => {
                   const pct = studentAvg(selected);
                   const sc = scoreColor(pct);
                   return (
                     <>
-                      <div className="bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border-b border-gray-700 px-6 py-5 flex items-center gap-4">
+                      <div className="bg-emerald-900/30 dark:bg-emerald-900/40 border-b border-gray-200 dark:border-gray-700 px-6 py-5 flex items-center gap-4">
                         <div className={`w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold bg-gradient-to-r ${sc.bg} border-2`}
                           style={{ color: sc.color, borderColor: sc.color }}>
                           {selected.avatar}
                         </div>
                         <div className="flex-1">
                           <h3 className="font-bold text-gray-100 text-xl">{selected.name}</h3>
-                          <p className="text-sm text-gray-400 font-medium">{selected.form} · Class {selected.class}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">{selected.form} · Class {selected.class}</p>
                         </div>
                         <div className="text-right">
                           <div className="text-3xl font-extrabold" style={{ color: sc.color }}>{pct}%</div>
-                          <div className="text-sm text-gray-400 font-medium">Overall average</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">Overall average</div>
                         </div>
                       </div>
 
@@ -266,10 +265,10 @@ export default function StudentProgress() {
                             { number: selected.booksRead, label: "Books Read", icon: <FiBook size={18} /> },
                             { number: selected.papersAccessed, label: "Papers Accessed", icon: <FiTrendingUp size={18} /> },
                           ].map((st, i) => (
-                            <div key={i} className="bg-gray-900/50 border border-gray-700 rounded-xl p-4 text-center hover:border-gray-600 transition-all">
+                            <div key={i} className="bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 text-center hover:border-gray-300 dark:hover:border-gray-600 transition-all">
                               <div className="text-emerald-400 mb-2">{st.icon}</div>
                               <div className="text-2xl font-extrabold text-emerald-400">{st.number}</div>
-                              <div className="text-sm font-semibold text-gray-400 mt-1">{st.label}</div>
+                              <div className="text-sm font-semibold text-gray-600 dark:text-gray-400 mt-1">{st.label}</div>
                             </div>
                           ))}
                         </div>
@@ -284,17 +283,17 @@ export default function StudentProgress() {
                         </div>
 
                         {/* Quiz History */}
-                        <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wide mb-3 flex items-center gap-2">
+                        <h4 className="text-sm font-bold text-gray-700 dark:text-gray-400 uppercase tracking-wide mb-3 flex items-center gap-2">
                           <MdOutlineQuiz size={16} /> Quiz History
                         </h4>
                         <div className="space-y-3">
                           {selected.quizzes.map((q, i) => {
                             const qPct = Math.round((q.score / q.total) * 100);
                             return (
-                              <div key={i} className="bg-gray-900/50 border border-gray-700 rounded-xl px-5 py-4 flex items-center justify-between hover:border-gray-600 transition-all">
+                              <div key={i} className="bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl px-5 py-4 flex items-center justify-between hover:border-gray-300 dark:hover:border-gray-600 transition-all">
                                 <div>
-                                  <p className="text-base font-bold text-gray-200">{q.subject} Quiz</p>
-                                  <p className="text-sm text-gray-400 font-medium">{q.date}</p>
+                                  <p className="text-base font-bold text-gray-900 dark:text-gray-200">{q.subject} Quiz</p>
+                                  <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">{q.date}</p>
                                 </div>
                                 <div className="flex items-center gap-4">
                                   <div className="w-32 hidden sm:block"><ProgressBar pct={qPct} /></div>
@@ -316,15 +315,15 @@ export default function StudentProgress() {
         {/* Needs Attention Table */}
         {needsHelp.length > 0 && (
           <section className="mt-8">
-            <h2 className="text-xl font-bold text-gray-200 mb-4 flex items-center gap-2">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-200 mb-4 flex items-center gap-2">
               <div className="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
                 <FiAlertCircle size={18} className="text-red-400" />
               </div>
               Students Needing Attention
               <span className="text-sm font-semibold text-red-400 ml-2">(below 60% average)</span>
             </h2>
-            <div className="bg-gray-800/50 border border-gray-700 rounded-xl overflow-hidden">
-              <div className="grid grid-cols-4 gap-3 bg-gray-700/30 px-6 py-4 text-sm font-bold text-gray-300 uppercase tracking-wide">
+            <div className="bg-white/90 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+              <div className="grid grid-cols-4 gap-3 bg-gray-50/90 dark:bg-gray-700/30 px-6 py-4 text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
                 <span>Student Name</span>
                 <span>Class</span>
                 <span>Average Score</span>
@@ -334,11 +333,11 @@ export default function StudentProgress() {
                 const pct = studentAvg(s);
                 return (
                   <button key={s.id} onClick={() => setSelected(s)}
-                    className="w-full grid grid-cols-4 gap-3 px-6 py-4 border-b border-gray-700 last:border-none hover:bg-gray-700/30 transition-all text-left">
-                    <span className="text-base font-semibold text-gray-200">{s.name}</span>
-                    <span className="text-base text-gray-400 font-medium">{s.form} · {s.class}</span>
+                    className="w-full grid grid-cols-4 gap-3 px-6 py-4 border-b border-gray-200 dark:border-gray-700 last:border-none hover:bg-gray-50/90 dark:hover:bg-gray-700/30 transition-all text-left">
+                    <span className="text-base font-semibold text-gray-900 dark:text-gray-200">{s.name}</span>
+                    <span className="text-base text-gray-600 dark:text-gray-400 font-medium">{s.form} · {s.class}</span>
                     <span className="text-base font-extrabold text-red-400">{pct}%</span>
-                    <span className="text-base text-gray-400 font-medium">{s.quizzes.length} completed</span>
+                    <span className="text-base text-gray-600 dark:text-gray-400 font-medium">{s.quizzes.length} completed</span>
                   </button>
                 );
               })}

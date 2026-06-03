@@ -1,22 +1,17 @@
 import { useEffect, useState } from "react";
 
-const THEME_STORAGE_KEY = "edulib-theme";
+const THEME_STORAGE_KEY = "theme";
 const themes = {
   light: "light",
   dark: "dark",
 };
 
 const getInitialTheme = () => {
-  if (typeof window === "undefined") return themes.dark;
+  if (typeof window === "undefined") return themes.light;
 
   const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-  if (storedTheme === themes.light || storedTheme === themes.dark) {
-    return storedTheme;
-  }
-
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? themes.dark
-    : themes.light;
+  // Default to light unless the user explicitly saved "dark"
+  return storedTheme === themes.dark ? themes.dark : themes.light;
 };
 
 const useThemeMode = () => {
@@ -24,8 +19,11 @@ const useThemeMode = () => {
 
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.toggle("theme-dark", theme === themes.dark);
-    root.classList.toggle("theme-light", theme === themes.light);
+    if (theme === themes.dark) {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
   }, [theme]);
 

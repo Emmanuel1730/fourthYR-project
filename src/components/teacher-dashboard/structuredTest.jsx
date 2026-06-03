@@ -1,4 +1,3 @@
-// structuredTest.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { 
   FiBook, FiClock, FiCalendar, FiAward, FiCheckCircle, 
@@ -40,7 +39,7 @@ function Spinner() {
   return (
     <div className="text-center py-12">
       <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-      <p className="text-gray-400 text-sm">Loading...</p>
+      <p className="text-gray-600 dark:text-gray-400 text-sm">Loading...</p>
     </div>
   );
 }
@@ -73,7 +72,7 @@ function Alert({ type = "info", children }) {
 
 function Card({ children, className = "" }) {
   return (
-    <div className={`bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-5 ${className}`}>
+    <div className={`bg-white/90 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl p-5 ${className}`}>
       {children}
     </div>
   );
@@ -82,14 +81,14 @@ function Card({ children, className = "" }) {
 function Btn({ children, onClick, variant = "primary", disabled = false, small = false, className = "" }) {
   const variants = {
     primary:   "bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-500 hover:to-emerald-600 shadow-lg shadow-emerald-500/25",
-    secondary: "bg-gray-700 text-gray-200 hover:bg-gray-600",
-    danger:    "bg-red-500/20 border border-red-500/50 text-red-400 hover:bg-red-500/30",
-    ghost:     "bg-transparent text-gray-400 hover:text-gray-200 border border-gray-700 hover:border-gray-600",
-    info:      "bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-500 hover:to-blue-600 shadow-lg shadow-blue-500/25",
+    secondary: "bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-500 hover:to-emerald-600 shadow-lg shadow-emerald-500/25",
+    danger:    "bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-500 hover:to-emerald-600 shadow-lg shadow-emerald-500/25",
+    ghost:     "bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-500 hover:to-emerald-600 shadow-lg shadow-emerald-500/25",
+    info:      "bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-500 hover:to-emerald-600 shadow-lg shadow-emerald-500/25",
   };
   return (
     <button onClick={onClick} disabled={disabled}
-      className={`${variants[variant]} ${small ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm"} rounded-lg font-medium transition-all duration-200 flex items-center gap-2 disabled:opacity-50 ${className}`}>
+      className={`${variants[variant]} ${small ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm"} rounded-lg font-medium transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}>
       {children}
     </button>
   );
@@ -125,7 +124,7 @@ function QuestionEditor({ questions, onChange }) {
               onChange={e => update(i, "text", e.target.value)}
               placeholder="Question text..."
               rows={2}
-              className="flex-1 bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 resize-vertical"
+              className="flex-1 bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 resize-vertical"
             />
             <Btn variant="danger" small onClick={() => remove(i)}>
               <FiTrash2 size={12} /> Remove
@@ -134,28 +133,28 @@ function QuestionEditor({ questions, onChange }) {
 
           <div className="grid grid-cols-3 gap-3 mb-3">
             <div>
-              <label className="text-xs text-gray-400 block mb-1">Type</label>
+              <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Type</label>
               <select value={q.type} onChange={e => update(i, "type", e.target.value)}
-                className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-emerald-500">
+                className="w-full bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-emerald-500">
                 <option value="short">Short answer</option>
                 <option value="structured">Structured</option>
                 <option value="long">Long answer</option>
               </select>
             </div>
             <div>
-              <label className="text-xs text-gray-400 block mb-1">Marks</label>
+              <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Marks</label>
               <input type="number" min={1} max={20} value={q.marks}
                 onChange={e => update(i, "marks", e.target.value)}
-                className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-emerald-500" />
+                className="w-full bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-emerald-500" />
             </div>
             <div>
-              <label className="text-xs text-gray-400 block mb-1">Running Total</label>
+              <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Running Total</label>
               <div className="text-emerald-400 font-semibold text-sm py-1.5">{totalMarks} marks</div>
             </div>
           </div>
 
           <div>
-            <label className="text-xs text-gray-400 block mb-1 flex items-center gap-1">
+            <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1 flex items-center gap-1">
               <MdOutlineTipsAndUpdates size={12} /> Marking guidance (private)
             </label>
             <textarea
@@ -163,7 +162,7 @@ function QuestionEditor({ questions, onChange }) {
               onChange={e => update(i, "markingGuidance", e.target.value)}
               rows={2}
               placeholder="Key points the answer must include..."
-              className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 resize-vertical"
+              className="w-full bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 resize-vertical"
             />
           </div>
         </Card>
@@ -248,7 +247,7 @@ function CreateTestPage({ onBack, editingTest = null }) {
         <Btn variant="ghost" onClick={() => onBack(false)}>
           <FiArrowLeft size={14} /> Back
         </Btn>
-        <h2 className="text-xl font-semibold text-gray-200">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-200">
           {editingTest ? "Edit Test" : "Create New Test"}
         </h2>
       </div>
@@ -257,7 +256,7 @@ function CreateTestPage({ onBack, editingTest = null }) {
 
       {step === 1 && (
         <Card>
-          <h3 className="text-base font-semibold mb-4 flex items-center gap-2 text-gray-200">
+          <h3 className="text-base font-semibold mb-4 flex items-center gap-2 text-gray-900 dark:text-gray-200">
             <div className="w-7 h-7 rounded-lg bg-purple-500/20 flex items-center justify-center">
               <FaRobot size={14} className="text-purple-400" />
             </div>
@@ -265,35 +264,35 @@ function CreateTestPage({ onBack, editingTest = null }) {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="text-xs text-gray-400 block mb-1">Subject</label>
+              <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Subject</label>
               <select value={genForm.subject} onChange={e => setGenForm(f => ({ ...f, subject: e.target.value, topic: "" }))}
-                className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+                className="w-full bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
                 <option value="">Select subject</option>
                 {subjects.map(s => <option key={s}>{s}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-xs text-gray-400 block mb-1">Form / Level</label>
+              <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Form / Level</label>
               <select value={genForm.form} onChange={e => setGenForm(f => ({ ...f, form: e.target.value }))}
-                className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+                className="w-full bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
                 <option value="">Select form</option>
                 {["Form 1","Form 2","Form 3","Form 4"].map(f => <option key={f}>{f}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-xs text-gray-400 block mb-1">Topic</label>
+              <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Topic</label>
               <select value={genForm.topic} onChange={e => setGenForm(f => ({ ...f, topic: e.target.value }))}
                 disabled={!genForm.subject}
-                className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 disabled:opacity-50">
+                className="w-full bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 disabled:opacity-50">
                 <option value="">Select topic</option>
                 {topics.map(t => <option key={t}>{t}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-xs text-gray-400 block mb-1">Number of questions</label>
+              <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Number of questions</label>
               <input type="number" min={2} max={10} value={genForm.count}
                 onChange={e => setGenForm(f => ({ ...f, count: Number(e.target.value) }))}
-                className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
+                className="w-full bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
             </div>
           </div>
           <div className="flex gap-3">
@@ -311,7 +310,7 @@ function CreateTestPage({ onBack, editingTest = null }) {
       {step === 2 && (
         <div>
           <Card className="mb-4">
-            <h3 className="text-base font-semibold mb-4 flex items-center gap-2 text-gray-200">
+            <h3 className="text-base font-semibold mb-4 flex items-center gap-2 text-gray-900 dark:text-gray-200">
               <div className="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center">
                 <MdOutlineDescription size={14} className="text-emerald-400" />
               </div>
@@ -319,46 +318,46 @@ function CreateTestPage({ onBack, editingTest = null }) {
             </h3>
             <div className="space-y-3">
               <div>
-                <label className="text-xs text-gray-400 block mb-1">Test title *</label>
+                <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Test title *</label>
                 <input value={meta.title} onChange={e => setMeta(m => ({ ...m, title: e.target.value }))}
-                  className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
                   placeholder="e.g. Biology End of Term Test" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-gray-400 block mb-1">Subject</label>
+                  <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Subject</label>
                   <input value={meta.subject} onChange={e => setMeta(m => ({ ...m, subject: e.target.value }))}
-                    className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
+                    className="w-full bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-400 block mb-1">Form</label>
+                  <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Form</label>
                   <input value={meta.form} onChange={e => setMeta(m => ({ ...m, form: e.target.value }))}
-                    className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
+                    className="w-full bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-400 block mb-1">Duration</label>
+                  <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Duration</label>
                   <input value={meta.duration} onChange={e => setMeta(m => ({ ...m, duration: e.target.value }))}
-                    className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
+                    className="w-full bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
                     placeholder="60 minutes" />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-400 block mb-1">Total marks</label>
+                  <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Total marks</label>
                   <div className="text-emerald-400 font-bold text-lg py-1.5">
                     {questions.reduce((s, q) => s + (q.marks || 0), 0)}
                   </div>
                 </div>
               </div>
               <div>
-                <label className="text-xs text-gray-400 block mb-1">Instructions to students</label>
+                <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Instructions to students</label>
                 <textarea value={meta.instructions} onChange={e => setMeta(m => ({ ...m, instructions: e.target.value }))}
-                  rows={2} className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 resize-vertical" />
+                  rows={2} className="w-full bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 resize-vertical" />
               </div>
             </div>
           </Card>
 
           <Card className="mb-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-semibold flex items-center gap-2 text-gray-200">
+              <h3 className="text-base font-semibold flex items-center gap-2 text-gray-900 dark:text-gray-200">
                 <div className="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center">
                   <MdOutlineQuestionAnswer size={14} className="text-emerald-400" />
                 </div>
@@ -460,10 +459,10 @@ function MarkSubmission({ submission, test, onBack }) {
           <FiArrowLeft size={14} /> Back
         </Btn>
         <div>
-          <h2 className="text-xl font-semibold text-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-200">
             Marking: {studentName}
           </h2>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-600 dark:text-gray-400">
             {test.title} · Submitted {new Date(submission.submittedAt).toLocaleDateString()}
           </p>
         </div>
@@ -477,10 +476,10 @@ function MarkSubmission({ submission, test, onBack }) {
           {aiLoading ? <FiLoader size={14} className="animate-spin" /> : <FaRobot size={14} />}
           {aiLoading ? " AI is marking..." : " Get AI suggestions"}
         </Btn>
-        <span className="text-gray-400 text-sm">or mark manually below</span>
+        <span className="text-gray-600 dark:text-gray-400 text-sm">or mark manually below</span>
         <div className="ml-auto text-right">
           <div className="text-2xl font-bold text-emerald-400">{totalAwarded} / {test.totalMarks ?? "?"}</div>
-          <div className="text-xs text-gray-400">{pct}% of total marks</div>
+          <div className="text-xs text-gray-600 dark:text-gray-400">{pct}% of total marks</div>
         </div>
       </div>
 
@@ -492,15 +491,15 @@ function MarkSubmission({ submission, test, onBack }) {
         return (
           <Card key={q.id} className="mb-4">
             <div className="flex justify-between items-start mb-3">
-              <p className="text-gray-200 font-medium flex-1 pr-4">
+              <p className="text-gray-900 dark:text-gray-100 font-medium flex-1 pr-4">
                 Q{i+1}. {q.text}
               </p>
               <Badge>{q.marks} marks</Badge>
             </div>
 
-            <div className="bg-gray-900/50 rounded-lg p-3 mb-3 border border-gray-700">
-              <p className="text-gray-400 text-xs mb-1 uppercase tracking-wide">Student answer</p>
-              <p className="text-gray-200 text-sm whitespace-pre-wrap">{answer}</p>
+            <div className="bg-white/90 dark:bg-gray-900/50 rounded-lg p-3 mb-3 border border-gray-200 dark:border-gray-700">
+              <p className="text-gray-600 dark:text-gray-400 text-xs mb-1 uppercase tracking-wide">Student answer</p>
+              <p className="text-gray-900 dark:text-gray-100 text-sm whitespace-pre-wrap">{answer}</p>
             </div>
 
             {q.markingGuidance && (
@@ -523,24 +522,24 @@ function MarkSubmission({ submission, test, onBack }) {
                     </Badge>
                   </div>
                 </div>
-                <p className="text-gray-300 text-xs">{ai.feedback}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-xs">{ai.feedback}</p>
               </div>
             )}
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-gray-400 block mb-1">Mark awarded</label>
+                <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Mark awarded</label>
                 <input type="number" min={0} max={q.marks}
                   value={m?.mark ?? 0}
                   onChange={e => updateMark(i, "mark", e.target.value)}
-                  className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
+                  className="w-full bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
               </div>
               <div>
-                <label className="text-xs text-gray-400 block mb-1">Feedback to student</label>
+                <label className="text-xs text-gray-600 dark:text-gray-400 block mb-1">Feedback to student</label>
                 <input value={m?.feedback ?? ""}
                   onChange={e => updateMark(i, "feedback", e.target.value)}
                   placeholder="Write feedback..."
-                  className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
+                  className="w-full bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
               </div>
             </div>
           </Card>
@@ -548,10 +547,10 @@ function MarkSubmission({ submission, test, onBack }) {
       })}
 
       <Card className="mb-4">
-        <label className="text-xs text-gray-400 block mb-2">Overall teacher comment</label>
+        <label className="text-xs text-gray-600 dark:text-gray-400 block mb-2">Overall teacher comment</label>
         <textarea value={comment} onChange={e => setComment(e.target.value)} rows={3}
           placeholder="Overall comments on student performance..."
-          className="w-full bg-gray-900/50 border border-gray-700 text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 resize-vertical" />
+          className="w-full bg-white/90 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 resize-vertical" />
       </Card>
 
       <Btn onClick={save} disabled={saving}>
@@ -592,8 +591,8 @@ function SubmissionsView({ test, onBack }) {
           <FiArrowLeft size={14} /> Back
         </Btn>
         <div>
-          <h2 className="text-xl font-semibold text-gray-200">{test.title}</h2>
-          <p className="text-xs text-gray-400">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-200">{test.title}</h2>
+          <p className="text-xs text-gray-600 dark:text-gray-400">
             {subs.length} submissions · {marked} marked · {pending} pending
           </p>
         </div>
@@ -601,7 +600,7 @@ function SubmissionsView({ test, onBack }) {
 
       {loading ? <Spinner /> : subs.length === 0 ? (
         <Card className="text-center py-8">
-          <p className="text-gray-400">No submissions yet</p>
+          <p className="text-gray-600 dark:text-gray-400">No submissions yet</p>
         </Card>
       ) : (
         <div className="space-y-3">
@@ -611,19 +610,19 @@ function SubmissionsView({ test, onBack }) {
               <Card key={s.id} className="hover:border-gray-600 transition-all">
                 <div className="flex items-center justify-between flex-wrap gap-3">
                   <div>
-                    <p className="text-gray-200 font-medium flex items-center gap-2">
-                      <FiUser size={14} className="text-gray-400" /> {name}
+                    <p className="text-gray-900 dark:text-gray-100 font-medium flex items-center gap-2">
+                      <FiUser size={14} className="text-gray-600 dark:text-gray-400" /> {name}
                     </p>
                     <div className="flex gap-2 mt-1">
                       {s.status === "MARKED" ? (
                         <>
-                          <Badge color="#10b981">✓ Marked</Badge>
+                          <Badge color="#10b981">Marked</Badge>
                           <Badge color="#60a5fa">{s.totalScore}/{test.totalMarks} — {s.percentage}%</Badge>
                         </>
                       ) : (
-                        <Badge color="#fbbf24">⏳ Awaiting marking</Badge>
+                        <Badge color="#fbbf24">Awaiting marking</Badge>
                       )}
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-600 dark:text-gray-400">
                         {new Date(s.submittedAt).toLocaleDateString()}
                       </span>
                     </div>
@@ -672,11 +671,11 @@ function TeacherTestsView() {
     <div>
       <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
         <div>
-          <h2 className="text-xl font-semibold text-gray-200 flex items-center gap-2">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-200 flex items-center gap-2">
             <MdOutlineQuiz size={22} className="text-emerald-400" />
             My Tests
           </h2>
-          <p className="text-xs text-gray-400 mt-1">{tests.length} tests created</p>
+          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{tests.length} tests created</p>
         </div>
         <Btn onClick={() => setView("create")}>
           <FiPlus size={14} /> Create test
@@ -685,10 +684,10 @@ function TeacherTestsView() {
 
       {loading ? <Spinner /> : tests.length === 0 ? (
         <Card className="text-center py-12">
-          <div className="w-16 h-16 bg-gray-700/30 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-gray-100/70 dark:bg-gray-700/30 rounded-full flex items-center justify-center mx-auto mb-4">
             <MdOutlineQuiz size={32} className="text-gray-500" />
           </div>
-          <p className="text-gray-400">No tests yet. Create one to get started</p>
+          <p className="text-gray-600 dark:text-gray-400">No tests yet. Create one to get started</p>
         </Card>
       ) : (
         <div className="space-y-3">
@@ -699,10 +698,10 @@ function TeacherTestsView() {
                 <div className="flex items-start justify-between flex-wrap gap-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 flex-wrap mb-2">
-                      <span className="text-gray-200 font-medium text-base">{t.title}</span>
+                      <span className="text-gray-900 dark:text-gray-100 font-medium text-base">{t.title}</span>
                       <Badge color={config.color} bg={config.bg}>{config.label}</Badge>
                     </div>
-                    <div className="flex flex-wrap gap-3 text-xs text-gray-400">
+                    <div className="flex flex-wrap gap-3 text-xs text-gray-600 dark:text-gray-400">
                       <span className="flex items-center gap-1"><FiBook size={12} /> {t.subject}</span>
                       <span className="flex items-center gap-1"><MdOutlineSchool size={12} /> {t.form}</span>
                       <span className="flex items-center gap-1"><FiClock size={12} /> {t.duration}</span>
@@ -780,7 +779,7 @@ function TakeTest({ test, onBack }) {
           <FiCheckCircle size={40} className="text-emerald-400" />
         </div>
         <h2 className="text-xl font-bold text-emerald-400 mb-2">Test submitted!</h2>
-        <p className="text-gray-400 mb-6">
+        <p className="text-gray-600 dark:text-gray-400 mb-6">
           Your answers have been sent to your teacher for marking.
         </p>
         <Btn onClick={onBack}>
@@ -795,19 +794,19 @@ function TakeTest({ test, onBack }) {
       <div className="sticky top-0 z-10 bg-gray-900/95 backdrop-blur-sm border-b border-gray-700 pb-3 mb-5">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <p className="text-gray-200 font-semibold">{test.title}</p>
-            <p className="text-xs text-gray-400">{test.subject} · {test.form} · {test.totalMarks} marks</p>
+            <p className="text-white font-semibold">{test.title}</p>
+            <p className="text-xs text-gray-300">{test.subject} · {test.form} · {test.totalMarks} marks</p>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold font-mono" style={{ color: timerColor }}>
                 {formatTime(timeLeft)}
               </div>
-              <div className="text-xs text-gray-400">remaining</div>
+              <div className="text-xs text-gray-300">remaining</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-emerald-400">{answered}/{total}</div>
-              <div className="text-xs text-gray-400">answered</div>
+              <div className="text-xs text-gray-300">answered</div>
             </div>
           </div>
         </div>
@@ -830,13 +829,13 @@ function TakeTest({ test, onBack }) {
               <span className="text-emerald-400 font-semibold text-sm">Question {i + 1}</span>
               <Badge>{q.marks} {q.marks === 1 ? "mark" : "marks"}</Badge>
             </div>
-            <p className="text-gray-200 text-sm mb-3 leading-relaxed">{q.text}</p>
+            <p className="text-gray-900 dark:text-gray-100 text-sm mb-3 leading-relaxed">{q.text}</p>
             <textarea
               value={answers[q.id] || ""}
               onChange={e => setAnswers(a => ({ ...a, [q.id]: e.target.value }))}
               rows={rowHeight}
               placeholder="Write your answer here..."
-              className={`w-full bg-gray-900/50 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 transition-all resize-vertical ${
+              className={`w-full bg-white/90 dark:bg-gray-900/50 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 transition-all resize-vertical ${
                 isAnswered ? "border-emerald-500 focus:ring-emerald-500" : "border-gray-700 focus:border-emerald-500"
               }`}
             />
@@ -889,7 +888,7 @@ function ViewResult({ test, studentId, onBack }) {
         <Btn variant="ghost" onClick={onBack}>
           <FiArrowLeft size={14} /> Back
         </Btn>
-        <h2 className="text-xl font-semibold text-gray-200">{test.title} — My Result</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-200">{test.title} — My Result</h2>
       </div>
 
       {isMarked ? (
@@ -901,11 +900,11 @@ function ViewResult({ test, studentId, onBack }) {
                <FiBarChart2 size={48} className="text-red-400 mx-auto" />}
             </div>
             <div className="text-4xl font-bold text-emerald-400 mb-1">{result.percentage}%</div>
-            <div className="text-gray-400">{result.totalScore} / {test.totalMarks} marks</div>
+            <div className="text-gray-600 dark:text-gray-400">{result.totalScore} / {test.totalMarks} marks</div>
             {result.teacherComment && (
               <div className="mt-4 p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/30 text-left">
                 <p className="text-emerald-400 text-xs uppercase tracking-wide mb-1">Teacher comment</p>
-                <p className="text-gray-200 text-sm">{result.teacherComment}</p>
+                <p className="text-gray-900 dark:text-gray-100 text-sm">{result.teacherComment}</p>
               </div>
             )}
           </Card>
@@ -916,21 +915,21 @@ function ViewResult({ test, studentId, onBack }) {
             return (
               <Card key={q.id} className="mb-3">
                 <div className="flex justify-between items-start mb-3">
-                  <span className="text-gray-200 font-medium">Q{i+1}. {q.text}</span>
+                  <span className="text-gray-900 dark:text-gray-100 font-medium">Q{i+1}. {q.text}</span>
                   {marked && (
                     <Badge color={marked.mark >= q.marks * 0.7 ? "#10b981" : marked.mark >= q.marks * 0.4 ? "#fbbf24" : "#f87171"}>
                       {marked.mark} / {q.marks}
                     </Badge>
                   )}
                 </div>
-                <div className="bg-gray-900/50 rounded-lg p-3 mb-3 border border-gray-700">
-                  <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">Your answer</p>
-                  <p className="text-gray-200 text-sm whitespace-pre-wrap">{answer}</p>
+                <div className="bg-white/90 dark:bg-gray-900/50 rounded-lg p-3 mb-3 border border-gray-200 dark:border-gray-700">
+                  <p className="text-gray-600 dark:text-gray-400 text-xs uppercase tracking-wide mb-1">Your answer</p>
+                  <p className="text-gray-900 dark:text-gray-100 text-sm whitespace-pre-wrap">{answer}</p>
                 </div>
                 {marked?.feedback && (
                   <div className="bg-blue-500/10 rounded-lg p-3 border border-blue-500/30">
                     <p className="text-blue-400 text-xs uppercase tracking-wide mb-1">Teacher feedback</p>
-                    <p className="text-gray-200 text-sm">{marked.feedback}</p>
+                    <p className="text-gray-900 dark:text-gray-100 text-sm">{marked.feedback}</p>
                   </div>
                 )}
               </Card>
@@ -942,8 +941,8 @@ function ViewResult({ test, studentId, onBack }) {
           <div className="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <FiClock size={40} className="text-amber-400" />
           </div>
-          <p className="text-gray-200 font-medium mb-1">Test submitted — awaiting marking</p>
-          <p className="text-gray-400 text-sm">Your teacher will mark your test and results will appear here</p>
+          <p className="text-gray-900 dark:text-gray-100 font-medium mb-1">Test submitted — awaiting marking</p>
+          <p className="text-gray-600 dark:text-gray-400 text-sm">Your teacher will mark your test and results will appear here</p>
         </Card>
       )}
     </div>
@@ -973,16 +972,16 @@ function StudentTestsView() {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-200 mb-5 flex items-center gap-2">
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-200 mb-5 flex items-center gap-2">
         <MdOutlineQuiz size={22} className="text-emerald-400" />
         Available Tests
       </h2>
       {loading ? <Spinner /> : tests.length === 0 ? (
         <Card className="text-center py-12">
-          <div className="w-16 h-16 bg-gray-700/30 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-gray-100/70 dark:bg-gray-700/30 rounded-full flex items-center justify-center mx-auto mb-4">
             <MdOutlineQuiz size={32} className="text-gray-500" />
           </div>
-          <p className="text-gray-400">No tests available yet</p>
+          <p className="text-gray-600 dark:text-gray-400">No tests available yet</p>
         </Card>
       ) : (
         <div className="space-y-3">
@@ -990,8 +989,8 @@ function StudentTestsView() {
             <Card key={t.id} className="hover:border-gray-600 transition-all">
               <div className="flex items-start justify-between flex-wrap gap-3">
                 <div className="flex-1">
-                  <p className="text-gray-200 font-medium text-base mb-1">{t.title}</p>
-                  <div className="flex flex-wrap gap-3 text-xs text-gray-400">
+                  <p className="text-gray-900 dark:text-gray-100 font-medium text-base mb-1">{t.title}</p>
+                  <div className="flex flex-wrap gap-3 text-xs text-gray-600 dark:text-gray-400">
                     <span className="flex items-center gap-1"><FiBook size={12} /> {t.subject}</span>
                     <span className="flex items-center gap-1"><MdOutlineSchool size={12} /> {t.form}</span>
                     <span className="flex items-center gap-1"><FiClock size={12} /> {t.duration}</span>
@@ -1020,7 +1019,7 @@ const StructuredTests = () => {
   const isTeacher = user?.role === "TEACHER" || user?.role === "ADMIN";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-white dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-emerald-400 flex items-center gap-2 mb-1">
@@ -1029,7 +1028,7 @@ const StructuredTests = () => {
             </div>
             Structured Tests
           </h1>
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-600 dark:text-gray-400 text-sm">
             {isTeacher
               ? "Create AI-generated written tests, review submissions, and mark with AI assistance"
               : "Take written tests set by your teacher and view your marked results"}
