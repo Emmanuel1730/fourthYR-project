@@ -192,7 +192,7 @@ const TeacherDashboard = () => {
                 <FiUserPlus size={16} /> Add Student
               </button>
               <Link to="/create-quiz"
-                className="bg-gradient-to-r from-amber-600 to-orange-500 text-white font-semibold px-5 py-2.5 rounded-xl hover:from-amber-500 hover:to-orange-500 transition-all text-sm flex items-center gap-2 shadow-lg shadow-amber-500/25">
+                className="bg-gradient-to-r from-amber-600 to-green-500 text-white font-semibold px-5 py-2.5 rounded-xl hover:from-amber-500 hover:to-orange-500 transition-all text-sm flex items-center gap-2 shadow-lg shadow-amber-500/25">
                 <FiEdit size={16} /> Create Quiz
               </Link>
             </div>
