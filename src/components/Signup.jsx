@@ -1,6 +1,6 @@
+// Signup.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Footer from "./Footer";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -26,10 +26,6 @@ const Signup = () => {
 
   const navigate = useNavigate();
 
-  // Fetch schools on mount.
-  // NOTE: GET /school requires JwtAuthGuard to be removed for this to work
-  // without a token. In your SchoolController, remove @UseGuards(JwtAuthGuard)
-  // from the class level or add a separate public route for GET.
   useEffect(() => {
     const fetchSchools = async () => {
       try {
@@ -43,7 +39,6 @@ const Signup = () => {
         setSchoolsLoading(false);
       }
     };
-
     fetchSchools();
   }, []);
 
@@ -103,175 +98,216 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0d1117]">
-      <div className="flex-1 flex items-center justify-center">
-        <div className="w-[360px] bg-[#161b22] border border-[#21262d] p-6 rounded-lg">
-
-          <h2 className="text-xl text-[#e6edf3] font-semibold mb-1">
-            Create Account
-          </h2>
-          <p className="text-sm text-[#6e7681] mb-5">
-            Sign up as Student or Teacher
-          </p>
-
-          {error && (
-            <div className="mb-4 px-3 py-2 bg-[#3d1f1f] border border-[#f85149] rounded-md text-sm text-[#f85149]">
-              {error}
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 flex flex-col">
+      <div className="flex-1 flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-md">
+          {/* Logo/Brand */}
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-emerald-500/25">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
             </div>
-          )}
-
-          {/* ROLE SELECT */}
-          <div className="flex mb-4 bg-[#0d1117] rounded-md p-1">
-            <button
-              type="button"
-              onClick={() => setRole("STUDENT")}
-              className={`flex-1 py-1 text-sm rounded-md ${
-                role === "STUDENT" ? "bg-[#2ea043] text-white" : "text-[#8b949e]"
-              }`}
-            >
-              Student
-            </button>
-            <button
-              type="button"
-              onClick={() => setRole("TEACHER")}
-              className={`flex-1 py-1 text-sm rounded-md ${
-                role === "TEACHER" ? "bg-[#2ea043] text-white" : "text-[#8b949e]"
-              }`}
-            >
-              Teacher
-            </button>
+            <h1 className="text-2xl font-bold text-gray-200">Create Account</h1>
+            <p className="text-gray-400 text-sm mt-1">Join the Malawi Edulib System</p>
           </div>
 
-          {/* FORM */}
-          <form onSubmit={handleSignup} className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <input
-                type="text"
-                placeholder="First Name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className="w-full bg-[#0d1117] border border-[#21262d] rounded-md px-3 py-2 text-sm text-[#e6edf3] focus:border-[#2ea043] outline-none"
-                required
-              />
-              <input
-                type="text"
-                placeholder="Last Name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                className="w-full bg-[#0d1117] border border-[#21262d] rounded-md px-3 py-2 text-sm text-[#e6edf3] focus:border-[#2ea043] outline-none"
-                required
-              />
+          {/* Signup Card */}
+          <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 shadow-xl">
+            {/* Role Toggle */}
+            <div className="flex mb-5 bg-gray-900/50 rounded-xl p-1">
+              <button
+                type="button"
+                onClick={() => setRole("STUDENT")}
+                className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                  role === "STUDENT" 
+                    ? "bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg shadow-emerald-500/25" 
+                    : "text-gray-400 hover:text-gray-200"
+                }`}>
+                Student
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole("TEACHER")}
+                className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                  role === "TEACHER" 
+                    ? "bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg shadow-emerald-500/25" 
+                    : "text-gray-400 hover:text-gray-200"
+                }`}>
+                Teacher
+              </button>
             </div>
 
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-[#0d1117] border border-[#21262d] rounded-md px-3 py-2 text-sm text-[#e6edf3] focus:border-[#2ea043] outline-none"
-              required
-            />
-
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-[#0d1117] border border-[#21262d] rounded-md px-3 py-2 text-sm text-[#e6edf3] focus:border-[#2ea043] outline-none"
-              required
-            />
-
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full bg-[#0d1117] border border-[#21262d] rounded-md px-3 py-2 text-sm text-[#e6edf3] focus:border-[#2ea043] outline-none"
-              required
-            />
-
-            <input
-              type="text"
-              placeholder="Library Card Number"
-              value={libraryCardNumber}
-              onChange={(e) => setLibraryCardNumber(e.target.value)}
-              className="w-full bg-[#0d1117] border border-[#21262d] rounded-md px-3 py-2 text-sm text-[#e6edf3] focus:border-[#2ea043] outline-none"
-              required
-            />
-
-            <input
-              type="date"
-              value={dateOfBirth}
-              onChange={(e) => setDateOfBirth(e.target.value)}
-              className="w-full bg-[#0d1117] border border-[#21262d] rounded-md px-3 py-2 text-sm text-[#e6edf3] focus:border-[#2ea043] outline-none"
-              required
-            />
-
-            {/* LEVEL — static, classes endpoint requires JWT so can't fetch pre-login */}
-            {role === "STUDENT" && (
-              <select
-                value={level}
-                onChange={(e) => setLevel(e.target.value)}
-                className="w-full bg-[#0d1117] border border-[#21262d] rounded-md px-3 py-2 text-sm text-[#e6edf3] focus:border-[#2ea043] outline-none"
-              >
-                <option value="Form 1">Form 1</option>
-                <option value="Form 2">Form 2</option>
-                <option value="Form 3">Form 3</option>
-                <option value="Form 4">Form 4</option>
-              </select>
+            {/* Error Message */}
+            {error && (
+              <div className="mb-4 px-3 py-2 rounded-xl text-sm flex items-center gap-2 bg-red-500/20 border border-red-500/50 text-red-400">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {error}
+              </div>
             )}
 
-            {/* SCHOOL SELECT — fetched from GET /school */}
-            {schoolsError ? (
-              <p className="text-sm text-[#f85149]">{schoolsError}</p>
-            ) : (
-              <select
-                value={schoolId}
-                onChange={(e) => setSchoolId(e.target.value)}
-                disabled={schoolsLoading}
-                className="w-full bg-[#0d1117] border border-[#21262d] rounded-md px-3 py-2 text-sm text-[#e6edf3] focus:border-[#2ea043] outline-none disabled:opacity-50"
-                required
+            {/* Signup Form */}
+            <form onSubmit={handleSignup} className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">First Name</label>
+                  <input
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-3 py-2 text-gray-200 text-sm focus:outline-none focus:border-emerald-500 transition-all"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">Last Name</label>
+                  <input
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-3 py-2 text-gray-200 text-sm focus:outline-none focus:border-emerald-500 transition-all"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-3 py-2 text-gray-200 text-sm focus:outline-none focus:border-emerald-500 transition-all"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-3 py-2 text-gray-200 text-sm focus:outline-none focus:border-emerald-500 transition-all"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">Confirm Password</label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-3 py-2 text-gray-200 text-sm focus:outline-none focus:border-emerald-500 transition-all"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">Library Card Number</label>
+                <input
+                  type="text"
+                  value={libraryCardNumber}
+                  onChange={(e) => setLibraryCardNumber(e.target.value)}
+                  className="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-3 py-2 text-gray-200 text-sm focus:outline-none focus:border-emerald-500 transition-all"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">Date of Birth</label>
+                <input
+                  type="date"
+                  value={dateOfBirth}
+                  onChange={(e) => setDateOfBirth(e.target.value)}
+                  className="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-3 py-2 text-gray-200 text-sm focus:outline-none focus:border-emerald-500 transition-all"
+                  required
+                />
+              </div>
+
+              {role === "STUDENT" && (
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">Form Level</label>
+                  <select
+                    value={level}
+                    onChange={(e) => setLevel(e.target.value)}
+                    className="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-3 py-2 text-gray-200 text-sm focus:outline-none focus:border-emerald-500 transition-all"
+                  >
+                    <option value="Form 1">Form 1</option>
+                    <option value="Form 2">Form 2</option>
+                    <option value="Form 3">Form 3</option>
+                    <option value="Form 4">Form 4</option>
+                  </select>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">School</label>
+                {schoolsError ? (
+                  <p className="text-sm text-red-400">{schoolsError}</p>
+                ) : (
+                  <select
+                    value={schoolId}
+                    onChange={(e) => setSchoolId(e.target.value)}
+                    disabled={schoolsLoading}
+                    className="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-3 py-2 text-gray-200 text-sm focus:outline-none focus:border-emerald-500 transition-all disabled:opacity-50"
+                    required
+                  >
+                    <option value="">{schoolsLoading ? "Loading schools..." : "Select School"}</option>
+                    {schools.map((s) => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">Bio</label>
+                <textarea
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  rows={3}
+                  className="w-full bg-gray-900/50 border border-gray-700 rounded-xl px-3 py-2 text-gray-200 text-sm focus:outline-none focus:border-emerald-500 transition-all resize-none"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || schoolsLoading}
+                className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 text-white py-2.5 rounded-xl text-sm font-medium hover:from-emerald-500 hover:to-emerald-600 transition-all disabled:opacity-50 mt-4 shadow-lg shadow-emerald-500/25"
               >
-                <option value="">
-                  {schoolsLoading ? "Loading schools..." : "Select School"}
-                </option>
-                {schools.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-            )}
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Creating account...
+                  </span>
+                ) : (
+                  `Sign up as ${role === "STUDENT" ? "Student" : "Teacher"}`
+                )}
+              </button>
+            </form>
 
-            <textarea
-              placeholder="Bio"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              className="w-full min-h-[100px] bg-[#0d1117] border border-[#21262d] rounded-md px-3 py-2 text-sm text-[#e6edf3] focus:border-[#2ea043] outline-none"
-              required
-            />
-
-            <button
-              type="submit"
-              disabled={loading || schoolsLoading}
-              className="w-full bg-[#2ea043] text-white py-2 rounded-md hover:bg-[#238636] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading
-                ? "Signing up..."
-                : `Sign up as ${role === "STUDENT" ? "Student" : "Teacher"}`}
-            </button>
-          </form>
-
-          <p className="text-sm text-[#6e7681] mt-4 text-center">
-            Already have an account?{" "}
-            <Link to="/" className="text-[#2ea043]">
-              Login
-            </Link>
-          </p>
+            {/* Login Link */}
+            <p className="text-sm text-gray-400 mt-5 text-center">
+              Already have an account?{" "}
+              <Link to="/" className="text-emerald-400 hover:text-emerald-300 font-medium transition-colors">
+                Sign in
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
 
-      <Footer />
+      {/* Footer */}
+      <footer className="text-center py-6 text-gray-500 text-sm border-t border-gray-800">
+        © 2026 Malawi Edulib System
+      </footer>
     </div>
   );
 };
