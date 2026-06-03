@@ -1,4 +1,3 @@
-// structuredTest.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { 
   FiBook, FiClock, FiCalendar, FiAward, FiCheckCircle, 

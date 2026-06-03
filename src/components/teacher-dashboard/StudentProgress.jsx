@@ -1,4 +1,3 @@
-// StudentProgress.jsx
 import React, { useState } from "react";
 import { FiSearch, FiUsers, FiTrendingUp, FiAward, FiAlertCircle, FiBook, FiCheckCircle } from "react-icons/fi";
 import { MdOutlineQuiz, MdOutlineSchool, MdOutlineClass } from "react-icons/md";
