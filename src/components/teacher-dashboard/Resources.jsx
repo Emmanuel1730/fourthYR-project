@@ -210,7 +210,7 @@ export default function TeacherResources() {
       });
 
       if (response.data) {
-        showToast(`"${form.title}" uploaded successfully!`);
+        showToast(`✨ "${form.title}" uploaded successfully!`);
         setForm({
           title: "", description: "", categoryId: "", classId: "",
           selectedTypeLabel: "PDF Document", type: "PDF",
@@ -228,14 +228,15 @@ export default function TeacherResources() {
     }
   };
 
+  // Original delete request function - sends request to admin
   const handleRequestDelete = async () => {
     if (!deleteTarget) return;
     
     try {
-      await api.post("/requests", {
+      // Using the original endpoint "/request" (singular) as in the original code
+      await api.post("/request", {
         requestName: `Delete Resource: ${deleteTarget.title}`,
-        fromUser: teacherName,
-        userRole: "TEACHER",
+        fromUser: "Teacher",
         type: "DELETE_RESOURCE",
         description: JSON.stringify({
           resourceId: deleteTarget.id,
@@ -285,6 +286,16 @@ export default function TeacherResources() {
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
+        /* Delete button hover effect - turns RED */
+        .delete-btn {
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          transition: all 0.3s ease;
+        }
+        .delete-btn:hover {
+          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
       `}</style>
 
       {toast && (
@@ -308,7 +319,7 @@ export default function TeacherResources() {
           <div className="relative flex items-center justify-between flex-wrap gap-4">
             <div>
               <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/25">
                   <MdOutlineLibraryBooks size={20} className="text-white" />
                 </div>
                 Teaching Resources
@@ -423,8 +434,9 @@ export default function TeacherResources() {
                         className="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white text-sm font-medium py-2 rounded-lg hover:from-emerald-500 hover:to-emerald-600 transition-all flex items-center justify-center gap-2">
                         <FiEye size={14} /> Preview
                       </button>
-                      <button onClick={() => setDeleteTarget(book)}
-                        className="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white text-sm font-medium py-2 rounded-lg hover:from-emerald-500 hover:to-emerald-600 transition-all flex items-center justify-center gap-2">
+                      <button 
+                        onClick={() => setDeleteTarget(book)}
+                        className="delete-btn flex-1 text-white text-sm font-medium py-2 rounded-lg flex items-center justify-center gap-2">
                         <FiTrash2 size={14} /> Delete
                       </button>
                     </div>
@@ -522,8 +534,8 @@ export default function TeacherResources() {
                 <select value={form.visibility}
                   onChange={(e) => setForm((f) => ({ ...f, visibility: e.target.value }))}
                   className="bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all">
-                  <option value="PUBLIC">Public - All Schools</option>
-                  <option value="PRIVATE">Private - My School Only</option>
+                  <option value="PUBLIC">🌍 Public - All Schools</option>
+                  <option value="PRIVATE">🔒 Private - My School Only</option>
                 </select>
               </div>
 
@@ -536,7 +548,7 @@ export default function TeacherResources() {
 
             <div className="flex gap-3">
               <button onClick={() => setShowModal(false)}
-                className="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-medium py-2.5 rounded-xl hover:from-emerald-500 hover:to-emerald-600 transition-all text-sm">
+                className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium py-2.5 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all text-sm">
                 Cancel
               </button>
               <button onClick={handleSubmit} disabled={uploading}
@@ -561,17 +573,20 @@ export default function TeacherResources() {
           <div className="bg-white dark:bg-gray-900 border border-red-500/20 dark:border-red-500/50 rounded-2xl w-full max-w-sm p-6 shadow-2xl">
             <MdDeleteForever size={48} className="mx-auto mb-3 text-red-500" />
             <h2 className="text-lg font-bold text-gray-900 dark:text-gray-200 text-center mb-2">Delete Resource?</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-6">
-              Are you sure you want to delete <span className="font-semibold text-gray-900 dark:text-gray-200">"{deleteTarget.title}"</span>?
+            <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-4">
+              Are you sure you want to request deletion of <span className="font-semibold text-gray-900 dark:text-gray-200">"{deleteTarget.title}"</span>?
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-500 text-center mb-6">
+              A request will be sent to the admin for approval.
             </p>
             <div className="flex gap-3">
               <button onClick={() => setDeleteTarget(null)}
-                className="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-medium py-2 rounded-xl hover:from-emerald-500 hover:to-emerald-600 transition-all">
+                className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium py-2.5 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all">
                 Cancel
               </button>
               <button onClick={handleRequestDelete}
-                className="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-medium py-2 rounded-xl hover:from-emerald-500 hover:to-emerald-600 transition-all">
-                Request Delete
+                className="flex-1 bg-gradient-to-r from-red-600 to-red-500 text-white font-medium py-2.5 rounded-xl hover:from-red-500 hover:to-red-600 transition-all shadow-lg shadow-red-500/25">
+                Send Request
               </button>
             </div>
           </div>
