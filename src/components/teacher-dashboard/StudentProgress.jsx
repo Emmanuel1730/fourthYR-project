@@ -166,11 +166,11 @@ export default function StudentProgress() {
               className="w-full pl-10 bg-white/90 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 placeholder-gray-500 transition-all font-medium" />
           </div>
           <select value={filterForm} onChange={(e) => setFilterForm(e.target.value)}
-            className="bg-white/50 dark:bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-emerald-500 transition-all font-medium">
+            className="bg-white/50  dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-emerald-500 transition-all font-medium">
             {FORMS.map((f) => <option key={f}>{f}</option>)}
           </select>
           <select value={filterClass} onChange={(e) => setFilterClass(e.target.value)}
-            className="bg-white/50 dark:bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-emerald-500 transition-all font-medium">
+            className="bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-emerald-500 transition-all font-medium">
             {CLASSES.map((c) => <option key={c}>{c}</option>)}
           </select>
           <span className="text-gray-300 text-base font-semibold ml-auto">{filtered.length} student{filtered.length !== 1 ? "s" : ""}</span>
@@ -229,8 +229,8 @@ export default function StudentProgress() {
           {/* Detail Panel */}
           <div className="md:col-span-3">
             {!selected ? (
-              <div className="bg-white/30 dark:bg-gray-50/30 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700 rounded-xl p-12 text-center h-full flex flex-col items-center justify-center">
-                <div className="w-20 h-20 bg-gray-100/70 dark:bg-gray-50/30 dark:bg-gray-700/30 rounded-full flex items-center justify-center mb-4">
+              <div className="bg-white/30 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700 rounded-xl p-12 text-center h-full flex flex-col items-center justify-center">
+                <div className="w-20 h-20 bg-gray-100/70 dark:bg-gray-700/30 rounded-full flex items-center justify-center mb-4">
                   <FiUsers size={40} className="text-gray-500" />
                 </div>
                 <p className="text-gray-400 text-base font-medium">Select a student to view their progress</p>
