@@ -5,7 +5,6 @@ import { Link, useNavigate } from "react-router-dom";
 const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 const Login = () => {
-  const [role, setRole] = useState("student");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -37,9 +36,8 @@ const Login = () => {
         return;
       }
 
-      const expectedRole = role.toUpperCase();
-      if (user.role !== expectedRole) {
-        setError(`This account is not a ${role}. Please select the correct role.`);
+      if (user.role !== "STUDENT" && user.role !== "TEACHER") {
+        setError("Unrecognized account role. Please contact your administrator.");
         return;
       }
 
@@ -73,30 +71,6 @@ const Login = () => {
 
           {/* Login Card */}
           <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 shadow-xl">
-            {/* Role Toggle */}
-            <div className="flex mb-5 bg-gray-900/50 rounded-xl p-1">
-              <button
-                type="button"
-                onClick={() => { setRole("student"); setError(""); }}
-                className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
-                  role === "student" 
-                    ? "bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg shadow-emerald-500/25" 
-                    : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
-                }`}>
-                Student
-              </button>
-              <button
-                type="button"
-                onClick={() => { setRole("teacher"); setError(""); }}
-                className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
-                  role === "teacher" 
-                    ? "bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg shadow-emerald-500/25" 
-                    : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
-                }`}>
-                Teacher
-              </button>
-            </div>
-
             {/* Error Message */}
             {error && (
               <div className="mb-4 px-4 py-3 rounded-xl text-sm flex items-center gap-2 bg-red-500/10 border border-red-500/50 text-red-400">
@@ -145,7 +119,7 @@ const Login = () => {
                     Signing in...
                   </span>
                 ) : (
-                  `Sign in as ${role}`
+                  "Sign In"
                 )}
               </button>
             </form>

@@ -38,36 +38,36 @@ function useTheme() {
 // ── Theme-aware class helpers ─────────────────────────────────────────────────
 function themeClasses(isDark) {
   return {
-    page:        isDark ? "bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 text-gray-100"
-                        : "bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900",
-    card:        isDark ? "bg-gray-800/50 border-gray-700 backdrop-blur-sm"
-                        : "bg-white border-gray-200 shadow-sm",
-    cardHover:   isDark ? "hover:border-gray-600 hover:bg-gray-800/70"
-                        : "hover:border-emerald-300 hover:shadow-md",
-    innerCard:   isDark ? "bg-gray-900/60 border-gray-700"
-                        : "bg-gray-50 border-gray-200",
-    hero:        isDark ? "bg-gradient-to-r from-emerald-600/20 to-teal-600/20 border-emerald-500/30"
-                        : "bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200",
-    heroText:    isDark ? "text-gray-100" : "text-gray-800",
-    heroSub:     isDark ? "text-emerald-400" : "text-emerald-600",
-    heading:     isDark ? "text-gray-200" : "text-gray-700",
-    body:        isDark ? "text-gray-300" : "text-gray-600",
-    muted:       isDark ? "text-gray-400" : "text-gray-500",
-    dimmed:      isDark ? "text-gray-500" : "text-gray-400",
-    progressBg:  isDark ? "bg-gray-700/50" : "bg-gray-200",
-    hoverRow:    isDark ? "hover:bg-gray-700/20" : "hover:bg-gray-50",
-    divider:     isDark ? "border-gray-700/50" : "border-gray-100",
-    trendBg:     isDark ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
-                        : "bg-emerald-50 border-emerald-200 text-emerald-700",
-    subjectHover:isDark ? "hover:bg-gray-900/60" : "hover:bg-gray-50",
-    modal:       isDark ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200",
-    modalHeader: isDark ? "bg-gray-900 border-gray-700" : "bg-white border-gray-100",
-    closeBtn:    isDark ? "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
-                        : "text-gray-400 hover:text-gray-700 hover:bg-gray-100",
-    historyBg:   isDark ? "bg-gray-800/50 border-gray-700 backdrop-blur-sm"
-                        : "bg-gray-50 border-gray-200",
-    error:       isDark ? "bg-red-500/10 border-red-500/50 text-red-400"
-                        : "bg-red-50 border-red-200 text-red-600",
+    page:         isDark ? "bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 text-gray-100"
+                         : "bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900",
+    card:         isDark ? "bg-gray-800/50 border-gray-700 backdrop-blur-sm"
+                         : "bg-white border-gray-200 shadow-sm",
+    cardHover:    isDark ? "hover:border-gray-600 hover:bg-gray-800/70"
+                         : "hover:border-emerald-300 hover:shadow-md",
+    innerCard:    isDark ? "bg-gray-900/60 border-gray-700"
+                         : "bg-gray-50 border-gray-200",
+    hero:         isDark ? "bg-gradient-to-r from-emerald-600/20 to-teal-600/20 border-emerald-500/30"
+                         : "bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200",
+    heroText:     isDark ? "text-gray-100" : "text-gray-800",
+    heroSub:      isDark ? "text-emerald-400" : "text-emerald-600",
+    heading:      isDark ? "text-gray-200" : "text-gray-700",
+    body:         isDark ? "text-gray-300" : "text-gray-600",
+    muted:        isDark ? "text-gray-400" : "text-gray-500",
+    dimmed:       isDark ? "text-gray-500" : "text-gray-400",
+    progressBg:   isDark ? "bg-gray-700/50" : "bg-gray-200",
+    hoverRow:     isDark ? "hover:bg-gray-700/20" : "hover:bg-gray-50",
+    divider:      isDark ? "border-gray-700/50" : "border-gray-100",
+    trendBg:      isDark ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+                         : "bg-emerald-50 border-emerald-200 text-emerald-700",
+    subjectHover: isDark ? "hover:bg-gray-900/60" : "hover:bg-gray-50",
+    modal:        isDark ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200",
+    modalHeader:  isDark ? "bg-gray-900 border-gray-700" : "bg-white border-gray-100",
+    closeBtn:     isDark ? "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
+                         : "text-gray-400 hover:text-gray-700 hover:bg-gray-100",
+    historyBg:    isDark ? "bg-gray-800/50 border-gray-700 backdrop-blur-sm"
+                         : "bg-gray-50 border-gray-200",
+    error:        isDark ? "bg-red-500/10 border-red-500/50 text-red-400"
+                         : "bg-red-50 border-red-200 text-red-600",
   };
 }
 
@@ -78,8 +78,10 @@ function ProgressBar({ value, color = "#2ea043", height = "h-2", isDark }) {
   const tc = themeClasses(isDark);
   return (
     <div className={`w-full ${tc.progressBg} rounded-full ${height} overflow-hidden`}>
-      <div className={`${height} rounded-full transition-all duration-700 ease-out`}
-        style={{ width: `${width}%`, backgroundColor: "#2ea043" }} />
+      <div
+        className={`${height} rounded-full transition-all duration-700 ease-out`}
+        style={{ width: `${width}%`, backgroundColor: "#2ea043" }}
+      />
     </div>
   );
 }
@@ -95,9 +97,14 @@ function SubjectModal({ subject, attempts, onClose, isDark }) {
   const best = Math.max(...attempts.map((a) => a.percentage));
 
   return (
-    <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className={`border rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto shadow-2xl ${tc.modal}`}
-        onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div
+        className={`border rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto shadow-2xl ${tc.modal}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className={`p-5 sticky top-0 border-b flex items-center justify-between rounded-t-2xl ${tc.modalHeader}`}>
           <div>
             <h2 className="text-lg font-bold" style={{ color }}>{subject}</h2>
@@ -113,7 +120,7 @@ function SubjectModal({ subject, attempts, onClose, isDark }) {
         </div>
         <div className="p-5 space-y-5">
           <div>
-            <div className={`flex justify-between text-xs mb-2`}>
+            <div className="flex justify-between text-xs mb-2">
               <span className={tc.muted}>Overall average</span>
               <span className={`font-bold ${tc.heroText}`}>{avg}%</span>
             </div>
@@ -124,10 +131,19 @@ function SubjectModal({ subject, attempts, onClose, isDark }) {
               <h3 className={`text-xs font-bold mb-2 ${tc.muted}`}>Score History</h3>
               <div className={`flex items-end gap-1.5 h-20 rounded-xl px-3 py-2 ${tc.innerCard} border`}>
                 {sorted.slice(-12).map((a, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center justify-end gap-1"
-                    title={`${a.percentage}% — ${a.topic}`}>
-                    <div className="w-full rounded-t transition-all"
-                      style={{ height: `${Math.max(4, a.percentage * 0.6)}px`, backgroundColor: "#2ea043", opacity: 0.6 + (i / sorted.length) * 0.4 }} />
+                  <div
+                    key={i}
+                    className="flex-1 flex flex-col items-center justify-end gap-1"
+                    title={`${a.percentage}% — ${a.topic}`}
+                  >
+                    <div
+                      className="w-full rounded-t transition-all"
+                      style={{
+                        height: `${Math.max(4, a.percentage * 0.6)}px`,
+                        backgroundColor: "#2ea043",
+                        opacity: 0.6 + (i / sorted.length) * 0.4,
+                      }}
+                    />
                   </div>
                 ))}
               </div>
@@ -143,7 +159,7 @@ function SubjectModal({ subject, attempts, onClose, isDark }) {
                 const topicAvg = Math.round(topicAttempts.reduce((s, a) => s + a.percentage, 0) / topicAttempts.length);
                 return (
                   <div key={topic}>
-                    <div className={`flex justify-between text-xs mb-1`}>
+                    <div className="flex justify-between text-xs mb-1">
                       <span className={`truncate pr-2 ${tc.heroText}`}>{topic}</span>
                       <span className={`flex-shrink-0 ${tc.muted}`}>{topicAvg}% · {topicAttempts.length}×</span>
                     </div>
@@ -160,27 +176,18 @@ function SubjectModal({ subject, attempts, onClose, isDark }) {
 }
 
 // ── ProgressWidget ────────────────────────────────────────────────────────────
-function ProgressWidget({ isDark }) {
-  const [attempts, setAttempts] = useState([]);
-  const [loading, setLoading]   = useState(true);
+// Now receives attempts + loading from parent instead of fetching independently
+function ProgressWidget({ isDark, attempts, attemptsLoading }) {
   const [selected, setSelected] = useState(null);
   const tc = themeClasses(isDark);
 
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    const hdrs  = { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) };
-    fetch(`${API_BASE}/quizzes/attempts/mine`, { headers: hdrs })
-      .then((r) => r.ok ? r.json() : [])
-      .then((data) => setAttempts(Array.isArray(data) ? data : []))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return (
+  if (attemptsLoading) return (
     <div className={`border rounded-2xl p-5 animate-pulse ${tc.card}`}>
       <div className={`h-4 rounded w-32 mb-4 ${isDark ? "bg-gray-700" : "bg-gray-200"}`} />
       <div className="space-y-3">
-        {[1, 2, 3].map((i) => <div key={i} className={`h-6 rounded ${isDark ? "bg-gray-700" : "bg-gray-200"}`} />)}
+        {[1, 2, 3].map((i) => (
+          <div key={i} className={`h-6 rounded ${isDark ? "bg-gray-700" : "bg-gray-200"}`} />
+        ))}
       </div>
     </div>
   );
@@ -191,7 +198,10 @@ function ProgressWidget({ isDark }) {
         <FiBarChart2 size={16} className="text-emerald-500" /> My Progress
       </h2>
       <p className={`text-sm ${tc.muted}`}>Take some quizzes to see your progress here!</p>
-      <Link to="/quizzes" className="inline-flex items-center gap-1 mt-3 text-sm text-emerald-500 hover:text-emerald-400 font-medium transition-colors">
+      <Link
+        to="/quizzes"
+        className="inline-flex items-center gap-1 mt-3 text-sm text-emerald-500 hover:text-emerald-400 font-medium transition-colors"
+      >
         Go to Quizzes <FiArrowRight size={13} />
       </Link>
     </div>
@@ -234,8 +244,11 @@ function ProgressWidget({ isDark }) {
           const subAvg = Math.round(subAttempts.reduce((s, a) => s + a.percentage, 0) / subAttempts.length);
           const color  = SUBJECT_COLORS[sub] || "#2ea043";
           return (
-            <button key={sub} onClick={() => setSelected(sub)}
-              className={`w-full text-left rounded-xl p-2 transition ${tc.subjectHover}`}>
+            <button
+              key={sub}
+              onClick={() => setSelected(sub)}
+              className={`w-full text-left rounded-xl p-2 transition ${tc.subjectHover}`}
+            >
               <div className="flex justify-between text-xs mb-1.5">
                 <span className="font-semibold" style={{ color }}>{sub}</span>
                 <span className={tc.muted}>{subAvg}% · {subAttempts.length}×</span>
@@ -277,11 +290,12 @@ const StudentDashboard = () => {
   const isDark = useTheme();
   const tc     = themeClasses(isDark);
 
-  const [userData, setUserData] = useState(null);
-  const [stats, setStats]       = useState(null);
-  const [activity, setActivity] = useState([]);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState(null);
+  const [userData, setUserData]   = useState(null);
+  const [stats, setStats]         = useState(null);
+  const [activity, setActivity]   = useState([]);
+  const [attempts, setAttempts]   = useState([]);   // ← lifted from ProgressWidget
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState(null);
 
   const token = localStorage.getItem("accessToken");
   const hdrs  = { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) };
@@ -289,18 +303,29 @@ const StudentDashboard = () => {
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const [profileRes, statsRes, activityRes] = await Promise.all([
-          fetch(`${API_BASE}/profiles/me`,       { headers: hdrs }),
-          fetch(`${API_BASE}/activity/me/stats`, { headers: hdrs }),
-          fetch(`${API_BASE}/activity/me`,       { headers: hdrs }),
+        const [profileRes, statsRes, activityRes, attemptsRes] = await Promise.all([
+          fetch(`${API_BASE}/profiles/me`,            { headers: hdrs }),
+          fetch(`${API_BASE}/activity/me/stats`,      { headers: hdrs }),
+          fetch(`${API_BASE}/activity/me`,            { headers: hdrs }),
+          fetch(`${API_BASE}/quizzes/attempts/mine`,  { headers: hdrs }),  // ← added
         ]);
+
         if (profileRes.ok)  setUserData(await profileRes.json());
         if (statsRes.ok)    setStats(await statsRes.json());
         if (activityRes.ok) setActivity(await activityRes.json());
+
+        // Derive quiz count from actual attempts data
+        const attemptsData = attemptsRes.ok ? await attemptsRes.json() : [];
+        setAttempts(Array.isArray(attemptsData) ? attemptsData : []);
       } catch {
         setError("Failed to load dashboard data.");
-        try { const stored = JSON.parse(localStorage.getItem("user")); if (stored) setUserData(stored); } catch {}
-      } finally { setLoading(false); }
+        try {
+          const stored = JSON.parse(localStorage.getItem("user"));
+          if (stored) setUserData(stored);
+        } catch {}
+      } finally {
+        setLoading(false);
+      }
     };
     fetchAll();
   }, []);
@@ -308,21 +333,24 @@ const StudentDashboard = () => {
   const displayName   = userData?.firstName ?? "Student";
   const displaySchool = userData?.school?.name ?? "";
 
+  // Quiz count now comes from attempts.length — always accurate
   const statCards = [
-    { number: stats?.downloads    ?? "—", label: "Downloads",         Icon: FiDownload,    gradient: "from-emerald-500 to-green-500"  },
-    { number: stats?.quizzesCount ?? "—", label: "Quizzes Completed", Icon: FiCheckCircle, gradient: "from-emerald-500 to-green-500"  },
-    { number: stats?.pastPapers   ?? "—", label: "Resources Viewed",  Icon: FiEye,         gradient: "from-emerald-500 to-green-500"  },
+    { number: stats?.downloads ?? "—", label: "Downloads",         Icon: FiDownload,    gradient: "from-emerald-500 to-green-500" },
+    { number: attempts.length,         label: "Quizzes Completed", Icon: FiCheckCircle, gradient: "from-emerald-500 to-green-500" },
+    { number: stats?.pastPapers ?? "—",label: "Resources Viewed",  Icon: FiEye,         gradient: "from-emerald-500 to-green-500" },
   ];
 
   const quickLinks = [
-    { title: "Books Library",    desc: "Browse textbooks and novels", Icon: FiBookOpen, link: "/books",       gradient: "from-emerald-500 to-green-500"  },
-    { title: "Past Papers",      desc: "Access exam papers",          Icon: FiFileText, link: "/past-papers", gradient: "from-emerald-600 to-green-600"  },
-    { title: "Practice Quizzes", desc: "Test your knowledge",         Icon: FiEdit3,    link: "/quizzes",     gradient: "from-green-500 to-emerald-500"  },
-    { title: "Study Materials",  desc: "Notes and worksheets",        Icon: FiBookmark, link: "/materials",   gradient: "from-emerald-500 to-teal-500"   },
+    { title: "Books Library",    desc: "Browse textbooks and novels", Icon: FiBookOpen, link: "/books",        gradient: "from-emerald-500 to-green-500" },
+    { title: "Past Papers",      desc: "Access exam papers",          Icon: FiFileText, link: "/past-papers",  gradient: "from-emerald-600 to-green-600" },
+    { title: "Practice Quizzes", desc: "Test your knowledge",         Icon: FiEdit3,    link: "/quizzes",      gradient: "from-green-500 to-emerald-500" },
+    { title: "Study Materials",  desc: "Notes and worksheets",        Icon: FiBookmark, link: "/materials",    gradient: "from-emerald-500 to-teal-500"  },
   ];
 
   const formatActivity = (item) => {
-    const time = new Date(item.createdAt).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+    const time = new Date(item.createdAt).toLocaleString("en-GB", {
+      day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
+    });
     switch (item.action) {
       case "DOWNLOAD":        return { text: `Downloaded "${item.resourceTitle ?? "a resource"}"`, time };
       case "RESOURCE_VIEWED": return { text: `Viewed "${item.resourceTitle ?? "a resource"}"`,     time };
@@ -371,8 +399,10 @@ const StudentDashboard = () => {
         {/* ── Stat Cards ── */}
         <section className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
           {statCards.map((stat, i) => (
-            <div key={i}
-              className={`relative overflow-hidden border p-5 rounded-2xl hover:-translate-y-0.5 transition-all duration-200 group ${tc.card} ${tc.cardHover}`}>
+            <div
+              key={i}
+              className={`relative overflow-hidden border p-5 rounded-2xl hover:-translate-y-0.5 transition-all duration-200 group ${tc.card} ${tc.cardHover}`}
+            >
               <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${stat.gradient} opacity-10 rounded-bl-full group-hover:opacity-20 transition-opacity`} />
               <div className={`w-10 h-10 bg-gradient-to-br ${stat.gradient} rounded-xl flex items-center justify-center mb-3 shadow-lg`}>
                 <stat.Icon size={18} className="text-white" />
@@ -391,8 +421,11 @@ const StudentDashboard = () => {
             </h2>
             <div className="grid md:grid-cols-2 gap-4">
               {quickLinks.map((item, i) => (
-                <Link key={i} to={item.link}
-                  className={`border rounded-2xl overflow-hidden transition-all duration-200 block group ${tc.card} ${tc.cardHover}`}>
+                <Link
+                  key={i}
+                  to={item.link}
+                  className={`border rounded-2xl overflow-hidden transition-all duration-200 block group ${tc.card} ${tc.cardHover}`}
+                >
                   <div className={`h-24 flex items-center justify-center bg-gradient-to-br ${item.gradient}`}>
                     <item.Icon size={36} className="text-white drop-shadow" />
                   </div>
@@ -407,7 +440,12 @@ const StudentDashboard = () => {
 
           <div className="lg:col-span-1">
             <h2 className="text-base font-bold mb-4">&nbsp;</h2>
-            <ProgressWidget isDark={isDark} />
+            {/* Pass attempts + loading down — no redundant fetch */}
+            <ProgressWidget
+              isDark={isDark}
+              attempts={attempts}
+              attemptsLoading={loading}
+            />
           </div>
         </section>
 
@@ -426,8 +464,10 @@ const StudentDashboard = () => {
                 const { text, time } = formatActivity(item);
                 const { Icon, color } = ACTIVITY_ICONS[item.action] ?? { Icon: FiBarChart2, color: "text-emerald-500" };
                 return (
-                  <div key={item.id ?? i}
-                    className={`flex items-start gap-3 p-4 border-b last:border-none transition-colors ${tc.divider} ${tc.hoverRow}`}>
+                  <div
+                    key={item.id ?? i}
+                    className={`flex items-start gap-3 p-4 border-b last:border-none transition-colors ${tc.divider} ${tc.hoverRow}`}
+                  >
                     <div className={`mt-0.5 flex-shrink-0 ${color}`}>
                       <Icon size={15} />
                     </div>
