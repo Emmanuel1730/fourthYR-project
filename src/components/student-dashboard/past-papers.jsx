@@ -14,7 +14,60 @@ const COLORS = [
   "from-amber-500 to-amber-800",   "from-rose-500 to-rose-800",
 ];
 
+function useTheme() {
+  const [isDark, setIsDark] = useState(() => {
+    const stored = localStorage.getItem("theme");
+    if (stored) return stored === "dark";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+  return isDark;
+}
+
+function tc(isDark) {
+  return {
+    page:      isDark ? "bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 text-gray-100"
+                      : "bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900",
+    card:      isDark ? "bg-gray-800/50 border-gray-700 backdrop-blur-sm"
+                      : "bg-white border-gray-200 shadow-sm",
+    cardHover: isDark ? "hover:border-gray-600 hover:bg-gray-800/70"
+                      : "hover:border-emerald-300 hover:shadow-md",
+    hero:      isDark ? "bg-gradient-to-r from-emerald-600/20 to-teal-600/20 border-emerald-500/30"
+                      : "bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200",
+    heroText:  isDark ? "text-gray-100" : "text-gray-800",
+    heroSub:   isDark ? "text-emerald-400/80" : "text-emerald-600",
+    input:     isDark ? "border-gray-700 bg-gray-900/60 text-gray-200 placeholder-gray-500 focus:border-emerald-500"
+                      : "border-gray-300 bg-white text-gray-800 placeholder-gray-400 focus:border-emerald-500",
+    select:    isDark ? "border-gray-700 bg-gray-900/60 text-gray-200 focus:border-emerald-500"
+                      : "border-gray-300 bg-white text-gray-800 focus:border-emerald-500",
+    muted:     isDark ? "text-gray-400" : "text-gray-500",
+    title:     isDark ? "text-gray-100" : "text-gray-800",
+    uploader:  isDark ? "text-gray-500" : "text-gray-400",
+    desc:      isDark ? "text-gray-500" : "text-gray-400",
+    lvlBadge:  isDark ? "bg-gray-700/50 text-gray-400" : "bg-gray-100 text-gray-500",
+    error:     isDark ? "bg-red-500/10 border-red-500/50 text-red-400"
+                      : "bg-red-50 border-red-200 text-red-600",
+    dlBtn:     isDark ? "bg-gray-700 border-gray-600 text-gray-200 hover:bg-gray-600"
+                      : "bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200",
+    pgBtn:     (active) => active
+                 ? "bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg shadow-emerald-500/25"
+                 : isDark ? "border border-gray-600 text-gray-300 hover:border-emerald-500" : "border border-gray-300 text-gray-600 hover:border-emerald-500",
+    pgNav:     (disabled) => disabled
+                 ? isDark ? "border border-gray-700 text-gray-600 cursor-not-allowed" : "border border-gray-200 text-gray-300 cursor-not-allowed"
+                 : isDark ? "border border-gray-600 text-gray-300 hover:border-emerald-500 hover:text-emerald-400" : "border border-gray-300 text-gray-600 hover:border-emerald-500",
+  };
+}
+
 const PastPapers = () => {
+  const isDark = useTheme();
+  const t = tc(isDark);
+
   const [papers, setPapers]               = useState([]);
   const [loading, setLoading]             = useState(true);
   const [error, setError]                 = useState(null);
@@ -45,9 +98,7 @@ const PastPapers = () => {
   }, []);
 
   const logActivity = async (action, title, metadata = {}) => {
-    try {
-      await fetch(`${API_BASE}/activity`, { method: "POST", headers, body: JSON.stringify({ action, resourceTitle: title, metadata }) });
-    } catch {}
+    try { await fetch(`${API_BASE}/activity`, { method: "POST", headers, body: JSON.stringify({ action, resourceTitle: title, metadata }) }); } catch {}
   };
 
   const handleDownload = async (paper) => {
@@ -83,105 +134,107 @@ const PastPapers = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0d1117] text-[#e6edf3] p-6">
-      <main className="max-w-6xl mx-auto p-4">
+    <div className={`min-h-screen p-6 transition-colors duration-300 ${t.page}`}>
+      <main className="max-w-6xl mx-auto">
 
-        {/* Hero Header */}
-        <section className="bg-[#1a3a2a] border border-[#2ea043] p-8 rounded-lg mb-6">
-          <h1 className="text-2xl font-bold mb-1 flex items-center gap-2">
-            <MdOutlineDescription className="text-[#2ea043]" /> Past Papers
-          </h1>
-          <p className="opacity-80 text-sm">Access and download past examination papers by subject and level.</p>
+        {/* Hero */}
+        <section className={`relative overflow-hidden border p-8 rounded-2xl mb-6 ${t.hero}`}>
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent pointer-events-none" />
+          <div className="relative flex items-center gap-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/25 flex-shrink-0">
+              <MdOutlineDescription size={22} className="text-white" />
+            </div>
+            <div>
+              <h1 className={`text-2xl font-bold mb-0.5 ${t.heroText}`}>Past Papers</h1>
+              <p className={`text-sm ${t.heroSub}`}>Access and download past examination papers by subject and level.</p>
+            </div>
+          </div>
         </section>
 
-        {/* Search & Filters */}
-        <div className="bg-[#161b22] border border-[#21262d] p-6 rounded-lg mb-6">
+        {/* Filters */}
+        <div className={`border p-6 rounded-2xl mb-6 transition-colors duration-300 ${t.card}`}>
           <div className="flex flex-col md:flex-row gap-3 mb-4">
             <input type="text" placeholder="Search past papers..."
               value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 border border-[#21262d] bg-[#0d1117] text-[#e6edf3] rounded-lg px-4 py-2 focus:border-[#2ea043] focus:outline-none placeholder-[#6e7681]" />
-            <button className="bg-[#2ea043] text-white px-6 py-2 rounded-lg hover:bg-[#3fb950] transition flex items-center gap-2">
-              <FiSearch size={16} className="text-white" /> Search
+              className={`flex-1 border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all ${t.input}`} />
+            <button className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-6 py-2.5 rounded-xl hover:from-emerald-500 hover:to-emerald-600 transition-all flex items-center gap-2 font-medium shadow-lg shadow-emerald-500/25">
+              <FiSearch size={16} /> Search
             </button>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             <select value={selectedLevel} onChange={(e) => setSelectedLevel(e.target.value)}
-              className="border border-[#21262d] bg-[#0d1117] text-[#e6edf3] p-2 rounded-md focus:border-[#2ea043] focus:outline-none">
+              className={`border p-2.5 rounded-xl focus:outline-none text-sm transition-all ${t.select}`}>
               <option>All Levels</option>
               <option>Form 1</option><option>Form 2</option>
               <option>Form 3</option><option>Form 4</option>
             </select>
             <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)}
-              className="border border-[#21262d] bg-[#0d1117] text-[#e6edf3] p-2 rounded-md focus:border-[#2ea043] focus:outline-none">
+              className={`border p-2.5 rounded-xl focus:outline-none text-sm transition-all ${t.select}`}>
               {subjects.map((s) => <option key={s}>{s}</option>)}
             </select>
           </div>
         </div>
 
-        {/* Results count */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-base font-semibold text-[#e6edf3]">
+        {/* Count */}
+        <div className="mb-4">
+          <p className={`text-sm ${t.muted}`}>
             Showing {Math.min(startIndex + 1, totalItems)}–{Math.min(startIndex + itemsPerPage, totalItems)} of {totalItems} past papers
-          </h2>
+          </p>
         </div>
 
-        {loading && (
-          <div className="text-center py-12 text-[#8b949e]">Loading past papers...</div>
-        )}
-        {error && (
-          <div className="bg-[#3d1a1a] border border-[#f85149] text-[#f85149] p-4 rounded-lg mb-4">{error}</div>
-        )}
+        {loading && <div className={`text-center py-12 ${t.muted}`}>Loading past papers...</div>}
+        {error && <div className={`border p-4 rounded-xl mb-4 text-sm ${t.error}`}>{error}</div>}
 
         {!loading && !error && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {currentPapers.length === 0 ? (
-              <div className="bg-[#161b22] border border-[#21262d] rounded-lg p-16 text-center text-[#6e7681]">
-                <FaRegFileAlt size={40} className="mx-auto mb-3 opacity-40 text-[#2ea043]" />
-                <p className="text-sm">No past papers found.</p>
+              <div className={`border rounded-2xl p-16 text-center ${t.card}`}>
+                <FaRegFileAlt size={40} className="mx-auto mb-3 opacity-30 text-emerald-500" />
+                <p className={`text-sm ${t.muted}`}>No past papers found.</p>
               </div>
             ) : currentPapers.map((paper, index) => (
               <div key={paper.id ?? index}
-                className="bg-[#161b22] border border-[#21262d] rounded-lg p-4 hover:border-[#2ea043] transition">
+                className={`border rounded-2xl p-4 transition-all duration-200 ${t.card} ${t.cardHover}`}>
                 <div className="flex items-center gap-4">
                   {/* Icon */}
-                  <div className={`w-20 h-24 bg-gradient-to-br ${COLORS[index % COLORS.length]} flex items-center justify-center rounded relative flex-shrink-0`}>
+                  <div className={`w-20 h-24 bg-gradient-to-br ${COLORS[index % COLORS.length]} flex items-center justify-center rounded-xl relative flex-shrink-0`}>
                     <FaRegFileAlt size={28} className="opacity-40 text-white" />
-                    <span className="absolute -top-1 -right-1 bg-[#2ea043] text-white text-xs px-1 py-0.5 rounded font-semibold">
+                    <span className="absolute -top-1 -right-1 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white text-xs px-1.5 py-0.5 rounded-lg font-semibold shadow">
                       PDF
                     </span>
                   </div>
                   {/* Info */}
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-[#e6edf3] text-base mb-1">{paper.title}</h3>
+                  <div className="flex-1 min-w-0">
+                    <h3 className={`font-semibold text-base mb-1 ${t.title}`}>{paper.title}</h3>
                     {paper.uploader && (
-                      <p className="text-xs text-[#6e7681] mb-1">
+                      <p className={`text-xs mb-1 ${t.uploader}`}>
                         Uploaded by {paper.uploader.firstName} {paper.uploader.lastName} · {formatDate(paper.createdAt)}
                       </p>
                     )}
-                    <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-center gap-2 flex-wrap">
                       {paper.category?.name && (
-                        <span className="text-xs font-semibold text-[#2ea043]">{paper.category.name}</span>
+                        <span className="text-xs font-semibold text-emerald-500">{paper.category.name}</span>
                       )}
                       {paper.targetClass?.name && (
-                        <span className="text-xs text-[#6e7681]">{paper.targetClass.name}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-lg ${t.lvlBadge}`}>{paper.targetClass.name}</span>
                       )}
                       {paper.targetAudience && (
-                        <span className="text-xs text-[#6e7681]">{paper.targetAudience}</span>
+                        <span className={`text-xs ${t.desc}`}>{paper.targetAudience}</span>
                       )}
                     </div>
                     {paper.description && (
-                      <p className="text-xs text-[#6e7681] mt-1 line-clamp-1">{paper.description}</p>
+                      <p className={`text-xs mt-1 line-clamp-1 ${t.desc}`}>{paper.description}</p>
                     )}
                   </div>
                   {/* Actions */}
                   <div className="flex gap-2 flex-shrink-0">
                     <button onClick={() => handlePreview(paper)}
-                      className="bg-[#2ea043] text-white px-3 py-2 rounded text-sm hover:bg-[#3fb950] transition flex items-center gap-1.5 font-semibold">
-                      <FiEye size={14} className="text-white" /> Preview
+                      className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-3 py-2 rounded-xl text-sm hover:from-emerald-500 hover:to-emerald-600 transition-all flex items-center gap-1.5 font-semibold shadow-lg shadow-emerald-500/20">
+                      <FiEye size={14} /> Preview
                     </button>
                     <button onClick={() => handleDownload(paper)}
-                      className="bg-[#238636] text-white px-3 py-2 rounded text-sm hover:bg-[#2ea043] transition flex items-center gap-1.5 font-semibold">
-                      <FiDownload size={14} className="text-white" /> Download
+                      className={`border px-3 py-2 rounded-xl text-sm transition-all flex items-center gap-1.5 font-semibold ${t.dlBtn}`}>
+                      <FiDownload size={14} /> Download
                     </button>
                   </div>
                 </div>
@@ -194,18 +247,18 @@ const PastPapers = () => {
         {!loading && !error && totalPages > 1 && (
           <div className="flex justify-center gap-2 mt-8">
             <button onClick={() => setCurrentPage((p) => p - 1)} disabled={currentPage === 1}
-              className={`border border-[#21262d] px-3 py-1 rounded flex items-center ${currentPage === 1 ? "text-[#6e7681] cursor-not-allowed" : "text-[#e6edf3] hover:border-[#2ea043]"}`}>
-              <FiChevronLeft size={16} className={currentPage === 1 ? "text-[#6e7681]" : "text-[#2ea043]"} />
+              className={`px-3 py-1.5 rounded-xl flex items-center transition-all ${t.pgNav(currentPage === 1)}`}>
+              <FiChevronLeft size={16} />
             </button>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button key={page} onClick={() => setCurrentPage(page)}
-                className={`px-3 py-1 rounded ${currentPage === page ? "bg-[#2ea043] text-white" : "border border-[#21262d] text-[#e6edf3] hover:border-[#2ea043]"}`}>
+                className={`px-3 py-1.5 rounded-xl text-sm font-medium transition-all ${t.pgBtn(currentPage === page)}`}>
                 {page}
               </button>
             ))}
             <button onClick={() => setCurrentPage((p) => p + 1)} disabled={currentPage === totalPages}
-              className={`border border-[#21262d] px-3 py-1 rounded flex items-center ${currentPage === totalPages ? "text-[#6e7681] cursor-not-allowed" : "text-[#e6edf3] hover:border-[#2ea043]"}`}>
-              <FiChevronRight size={16} className={currentPage === totalPages ? "text-[#6e7681]" : "text-[#2ea043]"} />
+              className={`px-3 py-1.5 rounded-xl flex items-center transition-all ${t.pgNav(currentPage === totalPages)}`}>
+              <FiChevronRight size={16} />
             </button>
           </div>
         )}
